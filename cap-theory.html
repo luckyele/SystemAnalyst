@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分布式数据库 CAP 理论 · 交互小课</title>
+<style>
+  :root {
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: #d1d5db;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --ok: #059669;
+    --bad: #dc2626;
+    --brand: #059669;
+    --brand-soft: #ecfdf5;
+    --brand-border: #a7f3d0;
+    --brand-text: #065f46;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 16px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    font-size: 16px;
+    line-height: 1.7;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 8px 0 12px; }
+  h2 { font-size: 18px; margin: 20px 0 8px; }
+  p { margin: 6px 0; }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin: 12px 0;
+  }
+  .conclusion { border-left: 4px solid var(--brand); }
+  .conclusion p { margin: 0; font-weight: 600; }
+  ul.terms { margin: 6px 0; padding-left: 20px; }
+  ul.terms li { margin: 4px 0; }
+  .hint { color: var(--muted); font-size: 14px; }
+  svg { display: block; }
+  .modes { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .modes button { flex: 1 1 140px; }
+  .mode-btn.active {
+    background: var(--brand-soft);
+    border-color: var(--brand);
+    color: var(--brand-text);
+    font-weight: 600;
+  }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; }
+  .actions button { flex: 1 1 150px; }
+  button {
+    font: inherit;
+    font-size: 15px;
+    min-height: 44px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    cursor: pointer;
+  }
+  button:hover:not(:disabled) { border-color: var(--brand); }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+  .ghost { color: var(--muted); }
+  .explain {
+    background: var(--brand-soft);
+    border: 1px solid var(--brand-border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin: 12px 0;
+  }
+  .explain p { margin: 0; }
+  ul.log {
+    margin: 8px 0 0;
+    padding-left: 20px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .foot { color: var(--muted); font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>分布式数据库 CAP 理论</h1>
+
+  <div class="card conclusion">
+    <p>网络故障无法避免，分区容错性 P 必选。所以分区发生时，只能在一致性 C 和可用性 A 之间二选一。</p>
+  </div>
+
+  <ul class="terms">
+    <li><b>一致性（C）</b>：任何节点返回的数据，都是最新写入的数据。</li>
+    <li><b>可用性（A）</b>：每个请求都能得到响应，而不是报错或超时。</li>
+    <li><b>分区容错性（P）</b>：节点之间网络中断时，系统仍能继续工作。</li>
+    <li><b>副本</b>：同一份数据，存到多个节点上。本例的节点 A 和节点 B 各存一份。</li>
+  </ul>
+
+  <h2>核心示意图</h2>
+  <div class="card">
+    <svg id="diagram" viewBox="0 0 480 250" width="100%" role="img"
+         aria-label="两个数据副本节点 A 和节点 B，中间是网络连接。分区时连接断开，写入无法同步。">
+      <defs>
+        <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="8" markerHeight="8"
+                markerUnits="userSpaceOnUse" orient="auto">
+          <path d="M1 1 L7 4 L1 7 Z" fill="#9ca3af"/>
+        </marker>
+      </defs>
+
+      <!-- 网络连接 -->
+      <line id="link" x1="166" y1="96" x2="314" y2="96"
+            stroke="#059669" stroke-width="2.5" stroke-linecap="round"/>
+      <g id="breakMark" style="display:none">
+        <line x1="230" y1="86" x2="250" y2="106" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+        <line x1="250" y1="86" x2="230" y2="106" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/>
+      </g>
+      <text id="linkLabel" x="240" y="74" text-anchor="middle"
+            font-size="15" font-weight="600" fill="#059669">同步中</text>
+
+      <!-- 节点 A -->
+      <rect x="16" y="56" width="150" height="80" rx="10"
+            fill="#ffffff" stroke="#d1d5db" stroke-width="1.5"/>
+      <text x="91" y="82" text-anchor="middle" font-size="18" font-weight="600" fill="#1f2937">节点 A</text>
+      <text x="91" y="108" text-anchor="middle" font-size="19" fill="#1f2937">
+        余额：<tspan id="va">1000</tspan> 元
+      </text>
+      <text id="aState" x="91" y="128" text-anchor="middle" font-size="14" fill="#6b7280">最新值</text>
+
+      <!-- 节点 B -->
+      <rect x="314" y="56" width="150" height="80" rx="10"
+            fill="#ffffff" stroke="#d1d5db" stroke-width="1.5"/>
+      <text x="389" y="82" text-anchor="middle" font-size="18" font-weight="600" fill="#1f2937">节点 B</text>
+      <text x="389" y="108" text-anchor="middle" font-size="19" fill="#1f2937">
+        余额：<tspan id="vb">1000</tspan> 元
+      </text>
+      <text id="bState" x="389" y="128" text-anchor="middle" font-size="14" fill="#6b7280">与 A 一致</text>
+
+      <!-- 写入与查询入口 -->
+      <line x1="91" y1="206" x2="91" y2="146" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <text x="91" y="228" text-anchor="middle" font-size="15" fill="#6b7280">你的写入</text>
+      <line x1="389" y1="206" x2="389" y2="146" stroke="#9ca3af" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <text x="389" y="228" text-anchor="middle" font-size="15" fill="#6b7280">你的查询</text>
+    </svg>
+    <p class="hint">图：同一份余额存在两个副本上。中间的线是网络。写入走节点 A，查询走节点 B。</p>
+  </div>
+
+  <h2>小实验：分区发生时，选 C 还是选 A</h2>
+  <div class="card">
+    <p class="hint">建议顺序：转出 100 元 → 断开网络 → 查询节点 B。再切换 CP / AP 各试一次。</p>
+
+    <div class="modes">
+      <button id="modeCP" class="mode-btn active">CP：保一致性</button>
+      <button id="modeAP" class="mode-btn">AP：保可用性</button>
+    </div>
+
+    <div class="actions">
+      <button id="btnWrite">节点 A 转出 100 元</button>
+      <button id="btnCut">断开网络</button>
+      <button id="btnHeal" disabled>恢复网络</button>
+      <button id="btnQuery">查询节点 B</button>
+      <button id="btnReset" class="ghost">重置</button>
+    </div>
+  </div>
+
+  <div class="explain">
+    <p id="explain">网络正常。两个副本数据相同。一致性和可用性都能满足。先试着写入一笔。</p>
+  </div>
+
+  <div class="card">
+    <p class="hint" style="margin-top:0">操作记录</p>
+    <ul class="log" id="log"></ul>
+  </div>
+
+  <h2>适用边界</h2>
+  <div class="card">
+    <ul class="terms">
+      <li>本实验假设：网络正常时，写入立即同步到两个副本。</li>
+      <li>分区恢复后的同步需要时间。等待期间仍可能读到旧数据。</li>
+      <li>CP 和 AP 不是非黑即白。真实系统常按操作分别选择。</li>
+      <li>CAP 只描述分区发生那一刻的保证，不是系统的全部评价标准。</li>
+    </ul>
+  </div>
+
+  <p class="foot">最终一致性：分区恢复后，副本重新同步，数据最终相同。</p>
+</div>
+
+<script>
+(function () {
+  var state = { a: 1000, b: 1000, cut: false, mode: 'CP' };
+  var el = {
+    va: document.getElementById('va'),
+    vb: document.getElementById('vb'),
+    aState: document.getElementById('aState'),
+    bState: document.getElementById('bState'),
+    link: document.getElementById('link'),
+    breakMark: document.getElementById('breakMark'),
+    linkLabel: document.getElementById('linkLabel'),
+    explain: document.getElementById('explain'),
+    log: document.getElementById('log'),
+    btnCut: document.getElementById('btnCut'),
+    btnHeal: document.getElementById('btnHeal'),
+    modeCP: document.getElementById('modeCP'),
+    modeAP: document.getElementById('modeAP')
+  };
+
+  function say(text) { el.explain.textContent = text; }
+
+  function log(text) {
+    var li = document.createElement('li');
+    li.textContent = text;
+    el.log.insertBefore(li, el.log.firstChild);
+    while (el.log.children.length > 12) { el.log.removeChild(el.log.lastChild); }
+  }
+
+  function render() {
+    el.va.textContent = state.a;
+    el.vb.textContent = state.b;
+    el.aState.textContent = '最新值';
+    el.aState.setAttribute('fill', '#059669');
+    var same = (state.b === state.a);
+    el.bState.textContent = state.cut && !same ? '旧值' : '与 A 一致';
+    el.bState.setAttribute('fill', state.cut && !same ? '#dc2626' : '#6b7280');
+
+    if (state.cut) {
+      el.link.setAttribute('stroke', '#9ca3af');
+      el.link.setAttribute('stroke-dasharray', '7 7');
+      el.linkLabel.textContent = '已断开';
+      el.linkLabel.setAttribute('fill', '#dc2626');
+      el.breakMark.style.display = '';
+    } else {
+      el.link.setAttribute('stroke', '#059669');
+      el.link.setAttribute('stroke-dasharray', 'none');
+      el.linkLabel.textContent = '同步中';
+      el.linkLabel.setAttribute('fill', '#059669');
+      el.breakMark.style.display = 'none';
+    }
+    el.btnCut.disabled = state.cut;
+    el.btnHeal.disabled = !state.cut;
+  }
+
+  function setMode(mode) {
+    state.mode = mode;
+    el.modeCP.classList.toggle('active', mode === 'CP');
+    el.modeAP.classList.toggle('active', mode === 'AP');
+    say(mode === 'CP'
+      ? '已切换到 CP。分区时，节点 B 会拒绝请求，保证不返回旧数据。'
+      : '已切换到 AP。分区时，节点 B 会照常回答，哪怕数据是旧的。');
+  }
+
+  document.getElementById('btnWrite').addEventListener('click', function () {
+    if (state.a < 100) { say('余额不足 100 元，无法再转出。点击「重置」再来一次。'); return; }
+    var old = state.a;
+    state.a -= 100;
+    if (state.cut) {
+      log('写入：节点 A 余额 ' + old + ' → ' + state.a + ' 元（分区中，节点 B 未收到）');
+      say('写入只到达节点 A。节点之间断了，同步不出去。节点 B 仍是旧值。');
+    } else {
+      state.b = state.a;
+      log('写入：两个副本同步为 ' + state.a + ' 元');
+      say('写入完成。网络正常，节点 B 立即同步。数据仍然一致。');
+    }
+    render();
+  });
+
+  el.btnCut.addEventListener('click', function () {
+    state.cut = true;
+    log('断开网络（分区发生）');
+    say('网络断开。节点 A 和节点 B 无法通信。这就是「分区」。分区容错性 P 必选，现在只能二选一。');
+    render();
+  });
+
+  el.btnHeal.addEventListener('click', function () {
+    state.cut = false;
+    if (state.b !== state.a) {
+      log('恢复网络：节点 B 从 ' + state.b + ' 同步为 ' + state.a + ' 元');
+      say('网络恢复。两个副本重新同步。数据最终相同。这就是「最终一致性」。');
+    } else {
+      log('恢复网络：两边数据本就相同');
+      say('网络恢复。两个副本数据相同。');
+    }
+    render();
+  });
+
+  document.getElementById('btnQuery').addEventListener('click', function () {
+    if (!state.cut) {
+      log('查询节点 B：返回 ' + state.b + ' 元（最新值）');
+      say('网络正常。节点 B 返回最新值。一致性和可用性都满足。');
+    } else if (state.mode === 'CP') {
+      log('查询节点 B：拒绝请求（CP）');
+      say('节点 B 无法确认数据是否最新。它拒绝回答。你得不到余额，但不会看到错误的钱数。这是 CP。');
+    } else if (state.b !== state.a) {
+      log('查询节点 B：返回 ' + state.b + ' 元（旧值，AP）');
+      say('节点 B 用旧值 ' + state.b + ' 元回答。你得到了响应，但数据是旧的。这是 AP。');
+    } else {
+      log('查询节点 B：返回 ' + state.b + ' 元（AP）');
+      say('节点 B 照常回答。此刻数值碰巧和 A 相同，但它无法保证数据是新的。这是 AP。');
+    }
+  });
+
+  document.getElementById('btnReset').addEventListener('click', function () {
+    state.a = 1000;
+    state.b = 1000;
+    state.cut = false;
+    el.log.innerHTML = '';
+    say('已重置。网络正常，两个副本都是 1000 元。');
+    render();
+  });
+
+  el.modeCP.addEventListener('click', function () { setMode('CP'); });
+  el.modeAP.addEventListener('click', function () { setMode('AP'); });
+
+  render();
+})();
+</script>
+</body>
+</html>

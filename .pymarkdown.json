@@ -1,0 +1,13 @@
+{
+  "log": {
+    "level": "WARNING"
+  },
+  "plugins": {
+    "line-length": {
+      "enabled": false
+    },
+    "no-emphasis-as-heading": {
+      "enabled": false
+    }
+  }
+}

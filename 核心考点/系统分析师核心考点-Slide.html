@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>系统分析师核心考点 · 第1～22章全景梳理</title>
+<style>
+/* ============ 基础重置与设计稿缩放（1280×720 等比适配任何视口） ============ */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;background:#080c14;}
+body{font-family:"Noto Sans SC","Source Han Sans SC","Microsoft YaHei","PingFang SC",sans-serif;color:#eef1f6;-webkit-font-smoothing:antialiased;}
+:root{
+  --bg:#0e1420; --bg2:#121a2a;
+  --amber:#f0b429; --teal:#4fd1c5; --red:#f27059; --violet:#a78bfa;
+  --ink:#eef1f6; --muted:#9aa7ba; --faint:#6b7689;
+  --line:rgba(255,255,255,.09); --card:rgba(255,255,255,.045);
+  --serif:"Noto Serif SC","Source Han Serif SC","STSong","SimSun",serif;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,"Courier New",monospace;
+}
+#viewport{position:fixed;inset:0;background:
+  radial-gradient(1200px 700px at 78% -10%,rgba(240,180,41,.07),transparent 60%),
+  radial-gradient(1000px 600px at 8% 108%,rgba(79,209,197,.06),transparent 60%),var(--bg);}
+#deck{
+  position:absolute;top:50%;left:50%;width:1280px;height:720px;
+  transform:translate(-50%,-50%) scale(min(calc(100vw / 1280px),calc(100vh / 720px)));
+  transform-origin:center;
+}
+.slide{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  padding:46px 64px 58px;
+  opacity:0;visibility:hidden;transition:opacity .45s ease;
+}
+.slide.active{opacity:1;visibility:visible;}
+
+/* ============ 通用元素 ============ */
+.kicker{font-size:14px;letter-spacing:.32em;color:var(--amber);font-weight:600;text-transform:uppercase;}
+h1{font-family:var(--serif);font-weight:700;font-size:64px;line-height:1.18;letter-spacing:.02em;}
+h2{font-family:var(--serif);font-size:30px;font-weight:700;letter-spacing:.02em;line-height:1.2;}
+.subtitle{font-size:21px;color:var(--muted);font-weight:400;letter-spacing:.04em;}
+.foot-note{position:absolute;left:64px;bottom:20px;font-size:12.5px;color:var(--faint);letter-spacing:.08em;}
+
+/* 章节页头部 */
+.ch-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.ch-chip{font-size:13px;letter-spacing:.22em;color:var(--amber);font-weight:600;border:1px solid rgba(240,180,41,.35);padding:5px 14px;border-radius:999px;background:rgba(240,180,41,.07);white-space:nowrap;}
+.ch-freq{font-size:13.5px;color:var(--teal);letter-spacing:.05em;white-space:nowrap;}
+.ch-title{display:flex;align-items:baseline;gap:18px;margin-bottom:22px;}
+.ch-title h2{font-size:34px;}
+.ch-title .en{font-size:13px;color:var(--faint);letter-spacing:.18em;text-transform:uppercase;}
+.ch-ghost{position:absolute;right:44px;top:18px;font-family:var(--serif);font-weight:700;font-size:210px;line-height:1;color:rgba(255,255,255,.035);pointer-events:none;user-select:none;font-style:italic;}
+
+/* 卡片网格 */
+.grid{display:grid;gap:16px;flex:1;min-height:0;}
+.g32{grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(2,1fr);}
+.g2{grid-template-columns:1fr 1fr;}
+.g3{grid-template-columns:repeat(3,1fr);}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:14px;padding:17px 19px;
+  display:flex;flex-direction:column;gap:9px;min-height:0;overflow:hidden;
+  backdrop-filter:blur(4px);
+}
+.card .c-title{font-size:16.5px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:9px;letter-spacing:.02em;}
+.card .c-title::before{content:"";width:4px;height:17px;border-radius:2px;background:var(--amber);flex:none;}
+.card.teal .c-title::before{background:var(--teal);}
+.card.red .c-title::before{background:var(--red);}
+.card p,.card li{font-size:14px;line-height:1.62;color:var(--muted);}
+.card ul{list-style:none;display:flex;flex-direction:column;gap:5px;}
+.card li{padding-left:14px;position:relative;}
+.card li::before{content:"";position:absolute;left:0;top:.68em;width:5px;height:5px;border-radius:50%;background:rgba(240,180,41,.55);}
+.card.teal li::before{background:rgba(79,209,197,.6);}
+.card.red li::before{background:rgba(242,112,89,.65);}
+.card b,.card strong{color:var(--ink);font-weight:600;}
+.hl{color:var(--amber);font-weight:600;}
+.hl-t{color:var(--teal);font-weight:600;}
+.hl-r{color:var(--red);font-weight:600;}
+.formula{font-family:var(--mono);font-size:13.5px;color:#ffd97a;background:rgba(240,180,41,.09);border:1px solid rgba(240,180,41,.22);border-radius:8px;padding:6px 10px;line-height:1.5;white-space:normal;word-break:break-word;}
+.tag{display:inline-block;font-size:11.5px;padding:2px 9px;border-radius:6px;letter-spacing:.04em;margin-right:6px;font-weight:600;}
+.tag.a{background:rgba(240,180,41,.14);color:var(--amber);}
+.tag.t{background:rgba(79,209,197,.13);color:var(--teal);}
+.tag.r{background:rgba(242,112,89,.14);color:var(--red);}
+
+/* ============ 封面 ============ */
+.cover{justify-content:center;gap:0;}
+.cover .rule{width:72px;height:4px;background:var(--amber);border-radius:2px;margin:26px 0 24px;}
+.cover h1{font-size:72px;}
+.cover .sub{margin-top:18px;font-size:23px;color:var(--muted);}
+.cover .meta{display:flex;gap:14px;margin-top:42px;}
+.cover .meta div{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:13px 22px;font-size:15.5px;color:var(--ink);letter-spacing:.05em;}
+.cover .meta span{color:var(--amber);font-family:var(--mono);font-size:13px;margin-right:9px;}
+.cover .corner{position:absolute;right:64px;top:46px;text-align:right;font-size:13px;color:var(--faint);letter-spacing:.2em;line-height:2;}
+.cover .seal{position:absolute;right:70px;bottom:96px;width:118px;height:118px;border:2px solid rgba(240,180,41,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--serif);color:rgba(240,180,41,.85);font-size:20px;line-height:1.5;letter-spacing:.1em;transform:rotate(-8deg);}
+
+/* ============ 总览四板块 ============ */
+.pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;flex:1;margin-top:6px;}
+.pillar{border:1px solid var(--line);border-radius:16px;padding:24px 20px;display:flex;flex-direction:column;background:var(--card);position:relative;overflow:hidden;}
+.pillar .p-no{font-family:var(--serif);font-size:44px;font-weight:700;color:rgba(240,180,41,.85);line-height:1;}
+.pillar .p-range{font-family:var(--mono);font-size:12px;color:var(--faint);letter-spacing:.1em;margin:8px 0 2px;}
+.pillar .p-name{font-size:19px;font-weight:700;margin-bottom:14px;letter-spacing:.03em;}
+.pillar ul{list-style:none;display:flex;flex-direction:column;gap:9px;}
+.pillar li{font-size:13.5px;color:var(--muted);line-height:1.45;padding-left:13px;position:relative;}
+.pillar li::before{content:"";position:absolute;left:0;top:.62em;width:5px;height:5px;border-radius:2px;background:var(--teal);}
+.pillar:nth-child(2) li::before{background:var(--amber);}
+.pillar:nth-child(3) li::before{background:var(--red);}
+.pillar:nth-child(4) li::before{background:var(--violet);}
+.bottom-bar{margin-top:18px;border:1px dashed rgba(79,209,197,.4);background:rgba(79,209,197,.06);border-radius:12px;padding:13px 22px;font-size:14.5px;color:var(--ink);display:flex;align-items:center;gap:14px;}
+.bottom-bar b{color:var(--teal);letter-spacing:.06em;white-space:nowrap;}
+
+/* ============ 条形图（考情） ============ */
+.bars{display:flex;flex-direction:column;gap:9px;flex:1;justify-content:center;}
+.bar-row{display:flex;align-items:center;gap:14px;font-size:14px;}
+.bar-row .b-label{width:205px;text-align:right;color:var(--muted);flex:none;line-height:1.3;}
+.bar-track{flex:1;height:23px;background:rgba(255,255,255,.045);border-radius:6px;overflow:hidden;}
+.bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,rgba(240,180,41,.35),var(--amber));display:flex;align-items:center;justify-content:flex-end;padding-right:10px;font-family:var(--mono);font-size:12px;color:#1a1405;font-weight:700;width:0;transition:width .9s cubic-bezier(.22,1,.36,1);}
+.bar-fill.gray{background:linear-gradient(90deg,rgba(154,167,186,.25),#7c8aa0);color:#0e1420;}
+.bar-row .b-star{width:78px;flex:none;font-size:12.5px;letter-spacing:1px;}
+.bar-row .b-star .on{color:var(--amber);}
+.bar-row .b-star .off{color:rgba(255,255,255,.16);}
+.slide.active .bar-fill{width:var(--w);}
+
+/* ============ 双栏（论文/公式页） ============ */
+.split{display:grid;grid-template-columns:1.05fr 1fr;gap:22px;flex:1;min-height:0;}
+.panel{border:1px solid var(--line);border-radius:14px;background:var(--card);padding:20px 22px;display:flex;flex-direction:column;min-height:0;}
+.panel .p-title{font-size:16px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:9px;}
+.panel .p-title::before{content:"";width:4px;height:16px;border-radius:2px;background:var(--teal);}
+.timeline{display:flex;flex-direction:column;gap:0;}
+.tl-item{display:flex;align-items:center;gap:14px;padding:9px 0;border-bottom:1px dashed rgba(255,255,255,.08);}
+.tl-item:last-child{border-bottom:none;}
+.tl-time{font-family:var(--mono);font-size:14px;color:var(--amber);width:96px;flex:none;font-weight:700;}
+.tl-bar-wrap{flex:1;}
+.tl-label{font-size:13.5px;color:var(--muted);margin-bottom:5px;display:flex;justify-content:space-between;}
+.tl-track{height:9px;border-radius:5px;background:rgba(255,255,255,.07);overflow:hidden;}
+.tl-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,rgba(240,180,41,.4),var(--amber));width:0;transition:width 1s cubic-bezier(.22,1,.36,1);}
+.slide.active .tl-fill{width:var(--w);}
+.kv{display:flex;flex-direction:column;gap:11px;font-size:14px;line-height:1.6;color:var(--muted);}
+.kv b{color:var(--ink);}
+.warnbox{margin-top:auto;border:1px solid rgba(242,112,89,.35);background:rgba(242,112,89,.08);border-radius:10px;padding:12px 15px;font-size:13px;line-height:1.6;color:#f3b4a6;}
+.warnbox b{color:var(--red);}
+
+/* ============ 路线 / 结语 ============ */
+.route{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:8px;}
+.route .step{border:1px solid var(--line);border-radius:16px;padding:26px 24px;background:var(--card);position:relative;}
+.route .step .s-no{font-family:var(--serif);font-size:40px;color:var(--amber);font-weight:700;line-height:1;}
+.route .step h3{font-size:21px;margin:12px 0 6px;}
+.route .step .s-time{font-size:12.5px;color:var(--teal);letter-spacing:.1em;margin-bottom:14px;}
+.route .step ul{list-style:none;display:flex;flex-direction:column;gap:8px;}
+.route .step li{font-size:13.5px;color:var(--muted);line-height:1.5;padding-left:14px;position:relative;}
+.route .step li::before{content:"";position:absolute;left:0;top:.6em;width:5px;height:5px;border-radius:50%;background:var(--amber);}
+.quote-block{margin-top:26px;text-align:center;}
+.quote-block .big{font-family:var(--serif);font-size:34px;color:var(--amber);letter-spacing:.08em;font-weight:700;}
+.quote-block .cite{margin-top:14px;font-size:14.5px;color:var(--faint);line-height:1.8;}
+
+/* ============ 导航 UI ============ */
+#progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,var(--amber),#ffd97a);width:0;z-index:50;transition:width .35s ease;box-shadow:0 0 12px rgba(240,180,41,.5);}
+#pager{position:fixed;right:22px;bottom:18px;z-index:50;font-family:var(--mono);font-size:13px;color:var(--muted);background:rgba(14,20,32,.72);border:1px solid var(--line);padding:6px 14px;border-radius:999px;letter-spacing:.1em;backdrop-filter:blur(8px);}
+#pager b{color:var(--amber);}
+.nav-btn{position:fixed;top:50%;transform:translateY(-50%);z-index:50;width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:rgba(14,20,32,.6);color:var(--muted);font-size:19px;cursor:display;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;backdrop-filter:blur(8px);opacity:.35;}
+.nav-btn:hover{opacity:1;color:var(--amber);border-color:rgba(240,180,41,.5);background:rgba(240,180,41,.1);}
+#prev{left:18px;}#next{right:18px;}
+#hint{position:fixed;left:22px;bottom:18px;z-index:50;font-size:11.5px;color:var(--faint);letter-spacing:.08em;}
+
+/* ============ reveal 动画 ============ */
+.rv{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s cubic-bezier(.22,1,.36,1);}
+.slide.active .rv{opacity:1;transform:translateY(0);transition-delay:var(--d,0s);}
+@media (prefers-reduced-motion:reduce){
+  .rv{opacity:1;transform:none;transition:none;}
+  .bar-fill,.tl-fill{transition:none;}
+  .slide{transition:none;}
+}
+</style>
+</head>
+<body>
+<div id="viewport">
+  <div id="progress"></div>
+  <div id="deck">
+
+  <!-- ============ P1 封面 ============ -->
+  <section class="slide cover active">
+    <div class="corner">软考高级 · 资格水平考试<br>SYSTEM ANALYST</div>
+    <div class="kicker rv" style="--d:.05s">软考高级 · 系统分析师</div>
+    <div class="rule rv" style="--d:.15s"></div>
+    <h1 class="rv" style="--d:.25s">系统分析师<br>核心考点</h1>
+    <div class="sub rv" style="--d:.4s">《系统分析师教程》第 1～22 章 · 全景梳理与真题考情</div>
+    <div class="meta rv" style="--d:.55s">
+      <div><span>01</span>22 章知识图谱</div>
+      <div><span>02</span>近三年真题考情</div>
+      <div><span>03</span>案例 · 论文双线突破</div>
+    </div>
+    <div class="seal rv" style="--d:.7s">75 选择<br>案例<br>论文</div>
+  </section>
+
+  <!-- ============ P2 知识体系总览 ============ -->
+  <section class="slide">
+    <div class="ch-head rv"><div class="ch-chip">OVERVIEW · 知识体系总览</div><div class="ch-freq">22 章 · 四大板块</div></div>
+    <div class="ch-title rv"><h2>一张图看清全书结构</h2><span class="en">Knowledge Map</span></div>
+    <div class="pillars">
+      <div class="pillar rv" style="--d:.1s">
+        <div class="p-no">壹</div><div class="p-range">CHAPTER 1–5</div><div class="p-name">基础理论</div>
+        <ul><li>绪论与系统工程</li><li>数学与工程基础</li><li>计算机系统</li><li>计算机网络</li><li>数据库系统（上/下）</li></ul>
+      </div>
+      <div class="pillar rv" style="--d:.22s">
+        <div class="p-no">贰</div><div class="p-range">CHAPTER 6–9</div><div class="p-name">管理方法</div>
+        <ul><li>企业信息化</li><li>软件工程</li><li>项目管理（上/下）</li><li>信息安全（上/下）</li></ul>
+      </div>
+      <div class="pillar rv" style="--d:.34s">
+        <div class="p-no">叁</div><div class="p-range">CHAPTER 10–15</div><div class="p-name">核心工程</div>
+        <ul><li>系统规划与分析</li><li>需求工程</li><li>软件架构 · 系统设计</li><li>软件测试 · 运行维护</li></ul>
+      </div>
+      <div class="pillar rv" style="--d:.46s">
+        <div class="p-no">肆</div><div class="p-range">CHAPTER 16–22</div><div class="p-name">前沿与实战</div>
+        <ul><li>Web / 嵌入式 / 移动</li><li>大数据 / 微服务</li><li>信息物理系统 CPS</li><li>论文写作专题</li></ul>
+      </div>
+    </div>
+    <div class="bottom-bar rv" style="--d:.58s"><b>案例固定四题型</b>DFD 建模　·　数据库设计　·　UML / 用例分析　·　架构风格与质量属性</div>
+  </section>
+
+  <!-- ============ P3 考情分析① ============ -->
+  <section class="slide">
+    <div class="ch-head rv"><div class="ch-chip">EXAM · 考情分析 ①</div><div class="ch-freq">综合知识 · 75 道选择题</div></div>
+    <div class="ch-title rv"><h2>分值分布：抓住前五大"基本盘"</h2><span class="en">Question Distribution</span></div>
+    <div class="bars">
+      <div class="bar-row rv" style="--d:.05s"><div class="b-label">企业信息化与项目管理</div><div class="b-star"><span class="on">★★★★</span></div><div class="bar-track"><div class="bar-fill" style="--w:90%">12–15</div></div></div>
+      <div class="bar-row rv" style="--d:.1s"><div class="b-label">计算机网络与信息安全</div><div class="b-star"><span class="on">★★★★</span></div><div class="bar-track"><div class="bar-fill" style="--w:73%">10–12</div></div></div>
+      <div class="bar-row rv" style="--d:.15s"><div class="b-label">软件工程与软件架构</div><div class="b-star"><span class="on">★★★★</span></div><div class="bar-track"><div class="bar-fill" style="--w:73%">10–12</div></div></div>
+      <div class="bar-row rv" style="--d:.2s"><div class="b-label">计算机系统与操作系统</div><div class="b-star"><span class="on">★★★★★</span></div><div class="bar-track"><div class="bar-fill" style="--w:60%">8–10</div></div></div>
+      <div class="bar-row rv" style="--d:.25s"><div class="b-label">数据库系统</div><div class="b-star"><span class="on">★★★★★</span></div><div class="bar-track"><div class="bar-fill" style="--w:60%">8–10</div></div></div>
+      <div class="bar-row rv" style="--d:.3s"><div class="b-label">专业英语</div><div class="b-star"><span class="on">★★</span><span class="off">★★★</span></div><div class="bar-track"><div class="bar-fill gray" style="--w:33%">5</div></div></div>
+      <div class="bar-row rv" style="--d:.35s"><div class="b-label">系统规划与需求工程</div><div class="b-star"><span class="on">★★</span><span class="off">★★★</span></div><div class="bar-track"><div class="bar-fill gray" style="--w:30%">3–6</div></div></div>
+      <div class="bar-row rv" style="--d:.4s"><div class="b-label">数学与工程基础</div><div class="b-star"><span class="on">★★</span><span class="off">★★★</span></div><div class="bar-track"><div class="bar-fill gray" style="--w:23%">2–5</div></div></div>
+      <div class="bar-row rv" style="--d:.45s"><div class="b-label">知识产权与标准化</div><div class="b-star"><span class="on">★★</span><span class="off">★★★</span></div><div class="bar-track"><div class="bar-fill gray" style="--w:20%">2–4</div></div></div>
+    </div>
+    <div class="bottom-bar rv" style="--d:.55s"><b>关键判断</b>前五大知识域合计占比通常 <span class="hl">超过 60%</span>；考试覆盖面广、题量大但深度较浅，重广度与基本应用。</div>
+  </section>
+
+  <!-- ============ P4 备考策略② ============ -->
+  <section class="slide">
+    <div class="ch-head rv"><div class="ch-chip">EXAM · 备考策略 ②</div><div class="ch-freq">方法论 · 三阶段路线</div></div>
+    <div class="ch-title rv"><h2>六条主线，事半功倍</h2><span class="en">Strategy</span></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">教程为纲</div><p>以官方教程章节为骨架，先通读建立全景，再按知识域回扣，不偏信零散资料。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">真题为镜</div><p>精研近三年真题。<b>2022 年后场景化命题明显</b>，同一考点常换业务场景重现。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">框架记忆</div><p>先搭知识框架再填细节；易混概念（如 BLP/Biba、耦合/内聚）成对对比记忆。</p></div>
+      <div class="card teal rv" style="--d:.26s"><div class="c-title">计算专项</div><p>套路固定、必须拿分：<b>关键路径、挣值分析、子网划分、PV 指标、香农/奈奎斯特、NPV/回收期</b>。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">命题趋势</div><p>纯记忆题占比下降，<b>场景判断题增多</b>；新技术（微服务、LLM、CPS）持续向论文与案例渗透。</p></div>
+      <div class="card red rv" style="--d:.4s"><div class="c-title">三阶段路线</div><p><b>基础精读 → 专项突破 → 模拟冲刺</b>；考前 1 个月限时整卷 + 手写论文各 2 篇。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P5 第1章 绪论 ============ -->
+  <section class="slide">
+    <div class="ch-ghost">01</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 01 · 绪论</div><div class="ch-freq">每年稳定 1～2 题</div></div>
+    <div class="ch-title rv"><h2>信息 · 系统 · 系统工程方法论</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">信息的度量（香农）</div>
+        <p>信息是不确定性的减少，单位比特（负熵）。</p>
+        <div class="formula">H(x) = − Σ P(xᵢ)·lb P(xᵢ)</div>
+        <p>概率越小，信息量越大。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">信息 11 大特征</div>
+        <p>客观性、普遍性、无限性、动态性、相对性、依附性、变换性、传递性、层次性、系统性、转化性。</p>
+        <p><b>传递性常考</b>：时间上传递=存储，空间上传递=转移/扩散。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">系统 9 特性 · 8 原理</div>
+        <p>9 特性：整体性、层次性、目的性、稳定性、突变性、自组织性、相似性、相关性、环境适应性。</p>
+        <p>8 原理：整体、整体突变（非加和）、层次、开放、目的、环境互塑共生、秩序、生命周期。</p></div>
+      <div class="card teal rv" style="--d:.26s"><div class="c-title">霍尔三维结构（硬系统）</div>
+        <p>时间维（规划→更新 7 阶段）、逻辑维（问题确定→实施 7 步骤）、知识维。</p>
+        <p>面向结构化问题，核心是<b>模型化与最优化</b>。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">切克兰德（软系统）</div>
+        <p>面向非结构化问题，核心不是"最优化"而是<span class="hl-t">"比较"</span>，通过学习找出<b>可行满意的结果</b>。</p></div>
+      <div class="card rv" style="--d:.4s"><div class="c-title">生命周期 · 角色</div>
+        <p>5 阶段：规划→分析→设计→实现→运行维护；4 原则：高层介入（CIO）、用户参与、自顶向下规划、工程化。</p>
+        <p><b>6 大角色，CIO 居金字塔塔尖</b>。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P6 第2章 数学 ============ -->
+  <section class="slide">
+    <div class="ch-ghost">02</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 02 · 数学与工程基础</div><div class="ch-freq">2～6 分 · "会者不难"</div></div>
+    <div class="ch-title rv"><h2>分布 · 图论 · 预测决策 · 线性规划</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">概率分布与数字特征</div>
+        <div class="formula">二项 E=np，D=np(1−p)</div>
+        <div class="formula">泊松 E = D = λ</div>
+        <div class="formula">均匀 E=(a+b)/2，D=(b−a)²/12</div></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">最小生成树</div>
+        <p><b>Prim</b> 从点扩展；<b>Kruskal</b> 按边归并。</p>
+        <p>均得 n−1 条边；各边权值唯一时，最小生成树唯一。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">最短路径</div>
+        <p>Dijkstra（非负权）、Floyd（全源）、Bellman-Ford（负权/负环检测）。</p>
+        <p><span class="tag r">2026 真题</span>A→F 最短路径 = <b>119</b>。</p></div>
+      <div class="card teal rv" style="--d:.26s"><div class="c-title">最大流解题套路</div>
+        <p>找路径 → 取各段容量最小值（短板）→ 各段扣减、为 0 断边 → 重复至无通路 → 流量求和。</p>
+        <p>教程例题 ①→⑥ = 10+6+5+1+1 = <b>23</b> 万吨。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">预测与决策</div>
+        <div class="formula">一次指数平滑 ŷ = αy + (1−α)ŷ₋</div>
+        <p>决策五准则：乐观、悲观、折中系数、等概率、最小后悔值。</p></div>
+      <div class="card rv" style="--d:.4s"><div class="c-title">线性规划</div>
+        <p>可行域为凸多边形，最优解必在<b>顶点</b>取得；最优方案的线性组合仍为最优解。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P7 第3章 计算机系统 ============ -->
+  <section class="slide">
+    <div class="ch-ghost">03</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 03 · 计算机系统</div><div class="ch-freq">8～10 题 · ★★★★★</div></div>
+    <div class="ch-title rv"><h2>存储体系 · I/O · 总线 · 可靠性</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">存储层次</div>
+        <p>寄存器 → Cache → 主存 → 辅存：按速度递减、容量递增、价格递减组织。</p>
+        <p>SRAM 做 Cache、DRAM 做主存。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">Cache 高频计算</div>
+        <div class="formula">平均周期 t₃ = h·t₁ + (1−h)·t₂</div>
+        <p>直接 / 全相联 / 组相联映射；淘汰用 LRU；写直达 vs 写回。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">I/O 五种方式</div>
+        <p>程序查询 → 程序中断 → DMA（周期挪用，不经过 CPU）→ 通道 → I/O 处理机，并行度依次提高。</p></div>
+      <div class="card teal rv" style="--d:.26s"><div class="c-title">总线带宽</div>
+        <div class="formula">带宽 = 总线宽度 × 频率</div>
+        <p>例：宽度 4B、2 个时钟周期传一次、10MHz → 4B×10M/2 = <b>20MB/s</b>。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">RAID 与磁盘</div>
+        <p>RAID 0 条带（无冗余）、1 镜像（利用率 50%）、5 分布式奇偶校验、10 镜像+条带。</p></div>
+      <div class="card red rv" style="--d:.4s"><div class="c-title">可靠性计算（必拿分）</div>
+        <div class="formula">串联 R = R₁ × R₂ × … × Rₙ</div>
+        <div class="formula">并联 R = 1 − (1−R)ⁿ</div></div>
+    </div>
+  </section>
+
+  <!-- ============ P8 第4章 网络 ============ -->
+  <section class="slide">
+    <div class="ch-ghost">04</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 04 · 计算机网络</div><div class="ch-freq">与安全合计 10～12 题</div></div>
+    <div class="ch-title rv"><h2>信道极限 · 协议栈 · IP 与分布式</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">码元与数据速率</div>
+        <div class="formula">码元速率 B = 1/T（波特）</div>
+        <div class="formula">数据速率 R = B · log₂N</div></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">奈奎斯特定理（无噪）</div>
+        <div class="formula">R = 2W · log₂N</div>
+        <p>码元速率上限 = 2 倍带宽。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">香农定理（有噪）</div>
+        <div class="formula">C = W · log₂(1 + S/N)</div>
+        <p><span class="tag r">2024 真题</span>2MHz、30dB（S/N=1000）→ C≈<b>20Mbps</b>，先把分贝换算成 S/N。</p></div>
+      <div class="card teal rv" style="--d:.26s"><div class="c-title">编码与体系</div>
+        <p>曼彻斯特（中间跳变，高→低为 1）、差分曼彻斯特、4B/5B。</p>
+        <p>OSI 七层 vs TCP/IP 四层；TCP 可靠面向连接 vs UDP 高效无连接。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">介质访问与 IP</div>
+        <p>CSMA/CD（有线、先听后发冲突检测）vs CSMA/CA（无线、避免冲突）。</p>
+        <p>私有地址 10/172.16/192.168 经 NAT 出网；CIDR 子网划分必考计算。</p></div>
+      <div class="card red rv" style="--d:.4s"><div class="c-title">分布式基础</div>
+        <p>分布式透明性（位置/迁移/复制…）；一致性哈希解决节点伸缩。</p>
+        <p><b>CAP</b>：网络分区 P 必选，强一致+故障容忍 → <span class="hl-r">CP，弃 A</span>（2026 考点）。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P9 第5章 数据库（上） ============ -->
+  <section class="slide">
+    <div class="ch-ghost">05</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 05 · 数据库系统（上）</div><div class="ch-freq">8～10 题 · ★★★★★</div></div>
+    <div class="ch-title rv"><h2>三级模式 · 关系代数 · 范式分解</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">三级模式两级映像</div>
+        <p>外模式 → 概念模式 → 内模式。</p>
+        <p>外/概念映像保证<b>逻辑独立性</b>；概念/内映像保证<b>物理独立性</b>。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">关系代数</div>
+        <p>选择 σ（行）、投影 π（列）、连接 ⋈、除 ÷；并差交笛卡尔积。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">函数依赖与候选键</div>
+        <p>Armstrong 公理：自反、增广、传递（导出合并/分解/伪传递）。</p>
+        <p>用图示法快速找候选键：只出现在左边的属性必在键中。</p></div>
+      <div class="card teal rv" style="--d:.26s"><div class="c-title">范式阶梯</div>
+        <p>1NF（原子性）→ 2NF（消非主属性对键的<b>部分依赖</b>）→ 3NF（消<b>传递依赖</b>）→ BCNF → 4NF（消多值依赖）。</p></div>
+      <div class="card red rv" style="--d:.33s"><div class="c-title">无损分解判定</div>
+        <div class="formula">(R₁∩R₂) → (R₁−R₂)</div>
+        <p style="text-align:center;color:var(--muted)">或</p>
+        <div class="formula">(R₁∩R₂) → (R₂−R₁)</div></div>
+      <div class="card rv" style="--d:.4s"><div class="c-title">分解两个目标</div>
+        <p>既要<b>无损连接</b>（可还原），又要<b>保持函数依赖</b>（约束不丢），二者需同时检查。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P10 第5章 数据库（下） ============ -->
+  <section class="slide">
+    <div class="ch-ghost">05</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 05 · 数据库系统（下）</div><div class="ch-freq">并发控制 · 设计与恢复</div></div>
+    <div class="ch-title rv"><h2>事务锁 · E-R 转关系 · SQL 优化 · 备份</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">事务 ACID</div>
+        <p>原子性、一致性、隔离性、持久性。</p>
+        <p>三类不一致：丢失修改、不可重复读、读"脏"数据。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">封锁协议</div>
+        <p>S 锁（读锁）/ X 锁（写锁）；一/二/三级封锁协议逐级解决三类问题。</p>
+        <p><b>两段锁协议</b>：扩展段只加锁、收缩段只解锁 → 可串行化。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">三类完整性</div>
+        <p>实体完整性（主键非空唯一）、参照完整性（外键）、用户自定义完整性（域/规则）。</p></div>
+      <div class="card teal rv" style="--d:.26s"><div class="c-title">E-R 图转关系模式</div>
+        <p>1:1 可并入任一端；<b>1:n 联系并入 n 端</b>；m:n 联系必须<b>单独建表</b>。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">性能与反规范化</div>
+        <p>反规范化以空间换时间，用<b>触发器</b>保证冗余数据同步。</p>
+        <p>SQL 优化：物化视图、复合最左前缀、B+ 树层级升高则索引失效。</p></div>
+      <div class="card rv" style="--d:.4s"><div class="c-title">备份与恢复</div>
+        <p>冷备份（停机）/ 热备份（在线）；<b>先写日志（WAL）</b>。</p>
+        <p>故障恢复：Redo（重做已提交）、Undo（撤销未提交）。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P11 第6章 企业信息化 ============ -->
+  <section class="slide">
+    <div class="ch-ghost">06</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 06 · 企业信息化</div><div class="ch-freq">12～15 题大章的一部分</div></div>
+    <div class="ch-title rv"><h2>信息化方法 · 战略三阶段 · BSP</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">企业信息化 5 种方法</div>
+        <p>BPR、核心业务应用、信息系统建设、主题数据库（SDP）、资源管理。</p>
+        <p><span class="hl">"企业战略规划"不属于</span>信息化具体方法。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">IRM 与 IRP</div>
+        <p>信息资源管理（IRM）+ 信息资源规划（IRP）<b>7 步骤</b>，强调数据标准化与主题库建设。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">三个战略层次</div>
+        <p>企业战略 → 信息系统战略（ISSP）→ IT 战略。</p>
+        <p>BITA（IT 对齐业务）vs EITA（IT 与业务融合/使能）。</p></div>
+      <div class="card red rv" style="--d:.26s"><div class="c-title">诺兰三阶段（2026 原题）</div>
+        <p><b>初级</b>：各部门分别提需求；</p>
+        <p><b>中级</b>：整体规划、分别实施；</p>
+        <p><b>高级</b>：统一规划、分步实施。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">BSP 企业系统规划</div>
+        <p>4 步骤；定义<b>企业过程为核心</b>；用 PO（过程/组织）、RD（资源/数据）、CU（创建/使用）矩阵。</p></div>
+      <div class="card teal rv" style="--d:.4s"><div class="c-title">CSF / SST / CSB</div>
+        <p>CSF 关键成功因素（抓重点）、SST 战略目标集转化（全覆盖）、CSB 二者结合取长补短。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P12 第7章 软件工程 ============ -->
+  <section class="slide">
+    <div class="ch-ghost">07</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 07 · 软件工程</div><div class="ch-freq">10～12 题 · 模型最高频</div></div>
+    <div class="ch-title rv"><h2>过程模型 · 敏捷 · CMMI · UML</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">生命周期 10 阶段</div>
+        <p>可行性研究→需求分析（"决定性的一步"）→概要/详细设计→实现→组装/确认测试→使用→维护→退役。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">传统开发模型</div>
+        <p>瀑布（文档驱动）、原型（需求不明）、<b>螺旋=风险驱动</b>（四活动）、V（测试对应开发）、RAD（快速开发）。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">RUP 与敏捷</div>
+        <p>RUP：初始→细化→构建→移交，迭代增量。</p>
+        <p>XP 四价值观：沟通、简单、反馈、勇气；Scrum：Sprint + 产品/迭代 Backlog。</p></div>
+      <div class="card teal rv" style="--d:.26s"><div class="c-title">过程成熟度</div>
+        <p>CMM 5 级：初始→可重复→已定义→已管理→优化。</p>
+        <p>CMMI：<b>阶段式 / 连续式双表示法</b>，共 24 个过程域。</p></div>
+      <div class="card red rv" style="--d:.33s"><div class="c-title">DFD 与 UML（案例高频）</div>
+        <p>DFD 案例已考 <b>6 次以上</b>。用例关系：包含（必执行）、扩展（可选）、泛化；序列图属动态视图。</p></div>
+      <div class="card rv" style="--d:.4s"><div class="c-title">重用与再工程</div>
+        <p>重用三层次：代码、设计、分析结果。</p>
+        <p>逆向工程（代码→设计）vs 再工程（逆向+正向重构）。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P13 第8章 项目管理（上） ============ -->
+  <section class="slide">
+    <div class="ch-ghost">08</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 08 · 项目管理（上）</div><div class="ch-freq">案例 + 选择题双线高频</div></div>
+    <div class="ch-title rv"><h2>WBS · 进度网络 · 挣值 · 成本估算</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">WBS 工作分解</div>
+        <p><b>100% 原则</b>：所有工作逐层分解到工作包，不多不少。</p>
+        <p>谈判口诀："决不让步，除非交换"。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">依赖关系两种图</div>
+        <p>PDM 前导图（单代号，支持 FS/FF/SS/SF 四种）。</p>
+        <p>ADM 箭线图（双代号，仅 FS，需<b>虚活动</b>表达逻辑）。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">关键路径与赶工</div>
+        <p>关键路径=最长路径，决定工期；总时差为 0。</p>
+        <p>赶工（加资源换时间）/ 快速跟进（并行改风险）；<b>Brooks 定律</b>：向延期项目加人只会更晚。</p></div>
+      <div class="card red rv" style="--d:.26s"><div class="c-title">挣值分析（必算）</div>
+        <div class="formula">CV = EV−AC　SV = EV−PV</div>
+        <div class="formula">CPI = EV/AC　SPI = EV/PV</div>
+        <p>EAC / ETC 按典型/非典型偏差分别套公式。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">成本估算三法</div>
+        <div class="formula">德尔菲三点 E=(a+4m+b)/6</div>
+        <div class="formula">类比 LOC =（重设计%+重编码%+重测试%）/3 × 已有 LOC</div>
+        <p>COCOMO：基本 / 中间 / 详细三级。</p></div>
+      <div class="card rv" style="--d:.4s"><div class="c-title">PERT vs Gantt</div>
+        <p>PERT 三点估算、展示任务依赖；Gantt 横道图直观展示进度与里程碑，但不显依赖关系。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P14 第8章 项目管理（下） ============ -->
+  <section class="slide">
+    <div class="ch-ghost">08</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 08 · 项目管理（下）</div><div class="ch-freq">配置 · 质量 · 风险</div></div>
+    <div class="ch-title rv"><h2>成本基线 · 配置管理 · 质量与风险</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">储备与成本基线</div>
+        <p><b>管理储备</b>应对"未知的未知"：<span class="hl">不计入成本基线、不参与挣值计算</span>；应急储备则计入基线。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">配置管理</div>
+        <p>三基线：功能基线、分配基线、产品基线。</p>
+        <p>三库：开发库（个人）、受控库（项目组）、产品库（发布）。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">质量模型与 QA/QC</div>
+        <p>GB/T 25000.10 八特性：功能性、性能效率、兼容性、易用性、可靠性、安全性、维护性、可移植性。</p>
+        <p>QA 重在过程预防，QC 重在产品检查；<b>"质量是计划出来的"</b>。</p></div>
+      <div class="card teal rv" style="--d:.26s"><div class="c-title">风险管理</div>
+        <p>识别可用 SWOT；四应对：规避、转移（外包/保险）、减轻、接受（主动留储备）。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">组织与责任</div>
+        <p>OBS 组织分解结构；RAM 责任分配矩阵（RACI）明确每项工作的负责/批准/咨询/知会人。</p></div>
+      <div class="card red rv" style="--d:.4s"><div class="c-title">案例题导向</div>
+        <p>进度控制 + 成本（挣值）类题目占案例分析 <b>70% 以上</b>，必须做到条件读图、公式秒写。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P15 第9章 信息安全（上） ============ -->
+  <section class="slide">
+    <div class="ch-ghost">09</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 09 · 信息安全（上）</div><div class="ch-freq">高频！高频！高频！</div></div>
+    <div class="ch-title rv"><h2>加密 · 摘要签名 · 证书 · 攻击</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">对称加密</div>
+        <p>加解密同钥、速度快。<b>大批量数据加密首选 AES</b>；DES 已不安全；3DES 用两个 56 位密钥、共 <b>112 位</b>。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">非对称与数字信封</div>
+        <p>RSA 密钥 512 位，安全性基于<b>大数分解</b>难题，速度慢，用于签名/密钥交换。</p>
+        <p>数字信封=随机对称钥加密正文 + 公钥加密对称钥。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">摘要与数字签名</div>
+        <p>MD5 输出 128 位；SHA-1 输出 160 位。</p>
+        <p>签名三点保证：<b>身份鉴别、不可否认、完整性</b>（私钥签、公钥验）。</p></div>
+      <div class="card teal rv" style="--d:.26s"><div class="c-title">PKI 与证书</div>
+        <p>CA 认证中心 + X.509 数字证书；CRL 证书吊销列表。</p>
+        <p>KMI（封闭网）/ PKI（开放网，只提供签名服务）/ SPK：LPK 用 RSA、CPK 用 DLP 或 ECC。</p></div>
+      <div class="card red rv" style="--d:.33s"><div class="c-title">攻击辨析</div>
+        <p>被动攻击：窃听、<b>业务流分析</b>（只看不改）；主动攻击：篡改、伪造、重放、拒绝服务。</p>
+        <p>防重放：时间戳 / 序列号 / 一次一密。</p></div>
+      <div class="card rv" style="--d:.4s"><div class="c-title">身份认证强度</div>
+        <p>口令认证（最不安全）→ 动态口令（一次一密）→ 生物特征识别（指纹/人脸）。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P16 第9章 信息安全（下） ============ -->
+  <section class="slide">
+    <div class="ch-ghost">09</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 09 · 信息安全（下）</div><div class="ch-freq">协议 · 访问控制 · 容灾</div></div>
+    <div class="ch-title rv"><h2>SSL/IPSec · 防火墙 · 模型 · 等保容灾</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">安全协议</div>
+        <p>SSL/TLS：握手 + 记录 + 报警三协议，端口 <b>443</b>。</p>
+        <p>IPSec：AH 只认证不加密、ESP 加密+认证；网络层安全。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">防火墙与 VPN</div>
+        <p>结构演进：双宿主机 → 屏蔽主机 → <b>屏蔽子网（DMZ 非军事区）</b>。</p>
+        <p>VPN 五大关键技术：隧道、加密、密钥管理、身份认证、访问控制。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">访问控制</div>
+        <p>三要素：主体、客体、控制策略。</p>
+        <p>DAC 自主 / MAC 强制 / RBAC 基于角色（0～3 级）/ TBAC 基于任务。</p></div>
+      <div class="card red rv" style="--d:.26s"><div class="c-title">BLP vs Biba（必考对比）</div>
+        <p><b>BLP 保机密性</b>：不上读、不下写；</p>
+        <p><b>Biba 保完整性</b>：不下读、不上写。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">等级保护</div>
+        <p>等保 2.0 分五级：用户自主→系统审计→安全标记→结构化→访问验证，级别越高越严。</p></div>
+      <div class="card teal rv" style="--d:.4s"><div class="c-title">容灾与 RPO/RTO</div>
+        <p>冷备 / 热备 / 双活（双中心）。RPO 能容忍丢多少数据、RTO 能容忍停多久。</p>
+        <p><span class="tag r">2026 案例</span>直播重 RTO、点播重 RPO。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P17 第10章 规划分析（上） ============ -->
+  <section class="slide">
+    <div class="ch-ghost">10</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 10 · 系统规划与分析（上）</div><div class="ch-freq">新版教材必考区</div></div>
+    <div class="ch-title rv"><h2>规划步骤 · 立项 · 可行性 · 问题分析</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">系统规划 6 步骤</div>
+        <p>初步调查 → 现状与需求分析 → 确定目标 → 规划方案 → 可行性研究 → 审批立项。</p>
+        <p>初步调查中，<b>与高层管理人员座谈</b>是获取战略需求的最佳方式。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">立项管理</div>
+        <p>立项 4 动机（问题/机会/要求/政策）；项目选择 5 步骤（筛选→评估→比较→推荐→批准）。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">可行性分析 4 维</div>
+        <p>经济可行性、技术可行性、法律可行性、<b>用户使用可行性</b>（=管理可行性+运行可行性）。</p></div>
+      <div class="card red rv" style="--d:.26s"><div class="c-title">问题分析 4 步（新考点）</div>
+        <p>定义问题 → 收集数据 → <b>画上下文图（界定系统边界）</b> → <b>因果分析（鱼骨图）</b>。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">上下文图 5 步构建</div>
+        <p>定系统边界 → 找外部实体 → 识别数据流 → 画 0 层上下文图 → 逐层分解并校验平衡。</p></div>
+      <div class="card rv" style="--d:.4s"><div class="c-title">系统分析阶段</div>
+        <p>三难点：问题空间理解、人与人沟通、环境不确定性。</p>
+        <p>核心产出：<b>SRS 软件需求规格说明书</b>（逻辑模型）。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P18 第10章 规划分析（下） ============ -->
+  <section class="slide">
+    <div class="ch-ghost">10</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 10 · 系统规划与分析（下）</div><div class="ch-freq">DFD + 经济效益计算</div></div>
+    <div class="ch-title rv"><h2>流程分析 · DFD 原则 · NPV 与回收期</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">业务流程分析</div>
+        <p>5 种分析法；工具：TFD 业务流程图、BAM 业务活动图、UML 活动图。</p>
+        <p>BPM 三层：业务规范层、方法层、产品（平台）层。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">DFD 四要素</div>
+        <p>外部实体、加工（过程）、数据流、数据存储。</p></div>
+      <div class="card red rv" style="--d:.19s"><div class="c-title">DFD 绘制原则（案例命根）</div>
+        <p>每个加工<b>有入必有出</b>；数据存储与外部实体之间<b>不得直连</b>；父子图须<b>平衡</b>（出入流一致）。</p></div>
+      <div class="card teal rv" style="--d:.26s"><div class="c-title">净现值 NPV</div>
+        <div class="formula">NPV = Σ (CI−CO)ₜ / (1+i)ᵗ</div>
+        <p><b>NPV &gt; 0 项目可行</b>；折现：P = F/(1+i)ⁿ。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">投资回收期</div>
+        <div class="formula">T = 转正年份−1 + |上年累计| / 当年净现金流</div>
+        <p>投资收益率 = 1 / 回收期（静态口径）。</p></div>
+      <div class="card rv" style="--d:.4s"><div class="c-title">两个矩阵别混淆</div>
+        <p><b>候选方案矩阵</b>用于多方案选型打分；<b>可行性分析矩阵</b>用于按四维度论证单个/多个方案可行性。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P19 第11章 需求（上） ============ -->
+  <section class="slide">
+    <div class="ch-ghost">11</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 11 · 需求工程（上）</div><div class="ch-freq">开发 + 管理两条线</div></div>
+    <div class="ch-title rv"><h2>需求层次 · 质量模型 · 获取方法</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">需求三层次</div>
+        <p>业务需求（高层目标）→ 用户需求（任务场景）→ 系统需求（功能/非功能，可验证）。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">QFD 三类需求</div>
+        <p><b>常规需求</b>（差了挨骂）、<b>期望需求</b>（越好越满意）、<b>意外需求</b>（惊喜型/兴奋型）。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">FURPS+</div>
+        <p>功能 Function、易用 Usability、可靠 Reliability、性能 Performance、可支持 Supportability，"+"为约束类。</p></div>
+      <div class="card teal rv" style="--d:.26s"><div class="c-title">开发 vs 管理</div>
+        <p>需求开发：获取 → 分析 → 编写 SRS → 验证。</p>
+        <p>需求管理：建立基线、<b>CCB 变更控制</b>、版本与需求跟踪矩阵。</p></div>
+      <div class="card red rv" style="--d:.33s"><div class="c-title">需求获取方法</div>
+        <p>访谈、问卷、采样、情节串联板、JRP 联合需求计划（<b>6～18 人</b>）。</p>
+        <p><span class="tag r">2025 考</span>90% 可信度抽样 → 因子 <b>1.645</b>。</p></div>
+      <div class="card rv" style="--d:.4s"><div class="c-title">用户故事 6 属性</div>
+        <p>独立性、可协商、有价值、可估算、小尺寸、可测试（INVEST）。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P20 第11章 需求（下） ============ -->
+  <section class="slide">
+    <div class="ch-ghost">11</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 11 · 需求工程（下）</div><div class="ch-freq">结构化 + 面向对象</div></div>
+    <div class="ch-title rv"><h2>三模型 · 数据守恒 · 用例与类</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">结构化分析三模型</div>
+        <p>E-R 图（数据模型）、DFD（功能模型）、STD 状态迁移图（行为模型）。</p>
+        <p>数据字典 6 类条目：数据流/数据项/数据结构/数据存储/加工/外部实体。</p></div>
+      <div class="card red rv" style="--d:.12s"><div class="c-title">DFD 三大病态（守恒）</div>
+        <p><b>黑洞</b>：数据有进无出；<b>奇迹</b>：无入有出；<b>灰洞</b>：输入不足以产生输出。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">用例建模 4 阶段</div>
+        <p>识别参与者 → 合并需求形成用例 → 细化用例描述 → 调整模型（粒度与关系）。</p></div>
+      <div class="card teal rv" style="--d:.26s"><div class="c-title">用例规约</div>
+        <p>用例名、参与者、前置条件、后置条件、主成功场景、扩展（异常）流、优先级。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">类之间 6 种关系</div>
+        <p>泛化（继承）、实现、关联、聚合（空心菱形）、组合（实心菱形）、依赖（虚线箭头）。</p></div>
+      <div class="card rv" style="--d:.4s"><div class="c-title">三类分析对象</div>
+        <p><b>实体对象</b>必须有属性；<b>控制对象</b>必须有方法、一般无属性；边界对象负责交互。识别用 CRC 卡 + 名词短语法。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P21 第12章 架构（上） ============ -->
+  <section class="slide">
+    <div class="ch-ghost">12</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 12 · 软件架构（上）</div><div class="ch-freq">"4+1" 视图必考</div></div>
+    <div class="ch-title rv"><h2>架构定义 · 五种模型 · 4+1 视图</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">架构的定义</div>
+        <p>软件架构 = <b>构件 + 连接件 + 约束</b>；是需求与设计之间的桥梁，决定质量属性。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">发展 4 阶段</div>
+        <p>"无架构"萌芽 → 基础研究 → 高级概念（体系结构风格）→ 综合与标准化阶段。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">五种描述模型</div>
+        <p>结构模型、框架模型、动态模型、过程模型、功能模型。</p></div>
+      <div class="card teal rv" style="--d:.26s"><div class="c-title">逻辑视图</div>
+        <p>面向最终用户的<b>功能需求</b>：类/包/对象模型（UML 类图），回答"系统应提供什么功能"。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">开发 / 进程 / 物理视图</div>
+        <p><b>开发视图</b>：模块分层与配置管理；<b>进程视图</b>：并发、同步、性能；<b>物理视图</b>：部署到硬件节点。</p></div>
+      <div class="card red rv" style="--d:.4s"><div class="c-title">场景视图（+1）</div>
+        <p>用例/场景贯穿前四视图并验证它们。</p>
+        <p><b>MIS 重逻辑+开发视图；实时/嵌入式系统重进程+物理视图</b>。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P22 第12章 架构（下） ============ -->
+  <section class="slide">
+    <div class="ch-ghost">12</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 12 · 软件架构（下）</div><div class="ch-freq">架构风格 · SOA · ABSD</div></div>
+    <div class="ch-title rv"><h2>五大风格 · C/S 与 B/S · 架构方法</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">数据流风格</div>
+        <p>批处理（顺序、整体传输）、<b>管道-过滤器</b>（流式、松耦合，如编译器流水线）。</p></div>
+      <div class="card red rv" style="--d:.12s"><div class="c-title">调用/返回风格</div>
+        <p>主程序-子程序、面向对象、<b>分层系统</b>。</p>
+        <p><span class="tag r">2026 真题</span>上层只能调用<b>相邻</b>的下层。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">数据中心风格</div>
+        <p>仓库系统（知识库被动存储）、<b>黑板系统</b>（知识源主动响应）——典型用于<b>语音识别</b>、信号处理。</p></div>
+      <div class="card rv" style="--d:.26s"><div class="c-title">虚拟机 / 独立构件</div>
+        <p>解释器、基于规则的系统；独立构件：进程通信、<b>事件驱动（隐式调用）</b>。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">C/S、B/S 与 SOA</div>
+        <p>三层 C/S（表示/功能/数据）；B/S 零客户端、易部署。</p>
+        <p>SOA 三角色 + UDDI 注册 / WSDL 描述 / SOAP 通信；REST 轻量；ESB 总线集成。</p></div>
+      <div class="card teal rv" style="--d:.4s"><div class="c-title">标准与方法</div>
+        <p>IEEE 1471 → ISO/IEC/IEEE <b>42010</b>；ABSD 架构基础软件设计，6 个子过程、视角驱动。</p>
+        <p>2024 考 SOA 论文、2026 考架构风格。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P23 第13章 系统设计（上） ============ -->
+  <section class="slide">
+    <div class="ch-ghost">13</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 13 · 系统设计（上）</div><div class="ch-freq">耦合内聚年年考</div></div>
+    <div class="ch-title rv"><h2>概要/详细设计 · 结构化设计</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">两级设计</div>
+        <p>概要设计：总体结构、模块划分、接口；<b>系统测试依据概要设计</b>。详细设计：模块内部算法与数据结构。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">流程与工作流</div>
+        <p>流程 6 要素；WFMS 工作流管理系统的核心是<b>工作流执行服务</b>。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">详细设计工具</div>
+        <p>程序流程图 PFD、N-S 盒图、PAD 问题分析图、判定树、<b>判定表（多条件组合）</b>、PDL 伪码。</p></div>
+      <div class="card teal rv" style="--d:.26s"><div class="c-title">模块经验值</div>
+        <p>规模约 <b>50～200 行</b>；扇入扇出保持 <b>3～4</b>、上限 7；高扇入共享、扇出适中。</p></div>
+      <div class="card red rv" style="--d:.33s"><div class="c-title">耦合（越低越好）</div>
+        <p>非直接 → 数据 → 标记 → 控制 → 外部 → 公共 → <b>内容</b>（最差，直接访问内部代码）。</p></div>
+      <div class="card red rv" style="--d:.4s"><div class="c-title">内聚（越高越好）</div>
+        <p>功能 → 顺序 → 通信 → 过程 → 瞬时 → 逻辑 → <b>偶然</b>（最差）。SC 图分变换型 / 事务型。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P24 第13章 系统设计（下） ============ -->
+  <section class="slide">
+    <div class="ch-ghost">13</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 13 · 系统设计（下）</div><div class="ch-freq">OOD 原则 · GoF 模式</div></div>
+    <div class="ch-title rv"><h2>面向对象设计原则与设计模式</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">OOD 六原则 ①</div>
+        <p><b>开闭原则</b>：对扩展开放、对修改关闭；<b>里氏替换</b>：子类可替父类；<b>依赖倒置</b>：依赖抽象不依赖具体。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">OOD 六原则 ②</div>
+        <p><b>组合/聚合复用</b>（优先组合而非继承）、<b>接口隔离</b>（小而专）、<b>迪米特法则</b>（最少知识）。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">持久化与 Web 设计</div>
+        <p>持久化框架（ORM）隔离对象模型与关系库；Web 分层（表示/控制/业务/数据访问）。</p></div>
+      <div class="card red rv" style="--d:.26s"><div class="c-title">GoF 23 种模式</div>
+        <p>创建型（Builder、Factory…）、结构型（Adapter、Composite…）、行为型（Iterator、Observer…）。</p>
+        <p><span class="tag r">2025 考</span>Builder 与 Iterator。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">输入与界面设计</div>
+        <p>输入设计 4 原则（最小量、早校验、少转换…）；界面黄金三原则：用户控制、减少记忆负担、保持一致。</p></div>
+      <div class="card teal rv" style="--d:.4s"><div class="c-title">趋势</div>
+        <p>传统结构化/OOD 与<b>微服务设计、领域驱动设计（DDD）</b>融合，服务粒度与接口设计成为新考点。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P25 第14章 测试 ============ -->
+  <section class="slide">
+    <div class="ch-ghost">14</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 14 · 软件测试</div><div class="ch-freq">几乎每年必考</div></div>
+    <div class="ch-title rv"><h2>黑白盒 · 静动态 · 四级测试</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">测试的目的</div>
+        <p>以<b>发现错误和缺陷</b>为目的，而非证明软件无错；尽早测试、贯穿生命周期、可追溯。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">软件重用 5 方式</div>
+        <p>函数重用、对象重用、模块重用、<b>类</b>重用、<b>算法</b>重用（2025 年原题选项辨析）。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">黑盒测试</div>
+        <p>等价类划分、边界值分析、因果图、判定表、错误推测、场景法；不看内部结构。</p></div>
+      <div class="card red rv" style="--d:.26s"><div class="c-title">白盒覆盖（由弱到强）</div>
+        <p>语句 → 判定（分支）→ 条件 → 判定/条件 → 条件组合 → <b>路径覆盖（最严格）</b>；工程用 McCabe <b>基本路径法</b>。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">静态 vs 动态</div>
+        <p>静态测试（评审、走查、静态分析）不运行程序，可发现 <b>30%～70%</b> 缺陷；动态测试需实际运行。</p>
+        <p><span class="tag r">2025 论文</span>静态与动态测试结合。</p></div>
+      <div class="card teal rv" style="--d:.4s"><div class="c-title">测试阶段与回归</div>
+        <p>单元（开发自测）→ 集成（<b>灰盒</b>，自顶向下/底向上/三明治）→ 系统 → 验收（<b>用户主导</b>）。</p>
+        <p>回归 4 策略 + 冒烟测试；2026 论文考 LLM 生成测试用例。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P26 第15章 运维 ============ -->
+  <section class="slide">
+    <div class="ch-ghost">15</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 15 · 系统运行与维护</div><div class="ch-freq">2025 爆发年</div></div>
+    <div class="ch-title rv"><h2>可用性 · 维护分类 · 遗留系统</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">运维指标口诀</div>
+        <p>MTTR 平均修复、MTBF 平均无故障（=MTTF+MTTR）、MTTF 平均故障前时间、MTTA 平均响应。</p></div>
+      <div class="card red rv" style="--d:.12s"><div class="c-title">可用性公式</div>
+        <div class="formula">A = MTBF / (MTBF + MTTR)</div>
+        <p><span class="tag r">2025 案例</span>MTBF=5000h、MTTR=2h → A≈99.96%。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">故障管理</div>
+        <p>故障分类三个维度；故障管理五活动：发现 → 受理 → 处理 → 恢复 → 关闭复盘。</p></div>
+      <div class="card teal rv" style="--d:.26s"><div class="c-title">软件维护四分类</div>
+        <p>改正性（修bug）、<b>适应性</b>（央行调利率改系统，2025 真题）、完善性（最多）、<b>预防性</b>："今天的方法学用于昨天的系统，满足明天的需要"。</p></div>
+      <div class="card rv" style="--d:.33s"><div class="c-title">维护性度量</div>
+        <p>维护阶段占生命周期 <b>60% 以上</b>（2025 选择题）；6 子特性：模块化、可重用、易分析/修改/测试、依从性；内部用 McCabe 环路数。</p></div>
+      <div class="card rv" style="--d:.4s"><div class="c-title">遗留系统四象限</div>
+        <p>低价值低质量→淘汰；低价值高质量→继承；高价值高质量→改造；高价值低质量→集成。系统转换：直接 / <b>并行（最常用）</b> / 分段。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P27 第16章 Web ============ -->
+  <section class="slide">
+    <div class="ch-ghost">16</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 16 · Web 系统开发</div><div class="ch-freq">MVC 与缓存高频</div></div>
+    <div class="ch-title rv"><h2>架构原则 · MV* · 协议 · 负载均衡</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">Web 架构 8 原则</div>
+        <p>分离关注点、单一职责、开闭、依赖倒置、<b>有界上下文</b>、无状态、高可用、可伸缩。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">整体式 vs 微服务</div>
+        <p>微服务三件套：<b>熔断、限流、降级</b>；用网关 + 注册中心治理。</p></div>
+      <div class="card teal rv" style="--d:.19s"><div class="c-title">MVC / MVP / MVVM</div>
+        <p>MVC：模型-视图-控制；MVP：Presenter 中转；<b>MVVM：ViewModel + 双向数据绑定</b>（Vue、小程序）。</p></div>
+      <div class="card red rv" style="--d:.26s"><div class="c-title">HTTP vs WebSocket</div>
+        <p>HTTP 请求-响应、半双工；<b>WebSocket 一次握手、全双工</b>，适合实时推送（2024 案例）。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">缓存</div>
+        <p>4 种缓存模型（Cache-Aside/Read-Through/Write-Through/Write-Behind）；<b>读多写少场景最适合缓存</b>（2026）。</p></div>
+      <div class="card rv" style="--d:.4s"><div class="c-title">负载均衡与框架</div>
+        <p>四层 LVS、七层 Nginx、DNS 轮询、HTTP 重定向；Java 框架 SSH（Struts/Spring/Hibernate）→ SSM。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P28 第17章 嵌入式 ============ -->
+  <section class="slide">
+    <div class="ch-ghost">17</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 17 · 嵌入式系统</div><div class="ch-freq">2026 案例：RTOS vs Linux</div></div>
+    <div class="ch-title rv"><h2>分层架构 · 实时调度 · 优先级反转</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">四层架构</div>
+        <p>硬件层 → <b>HAL/BSP 板级支持包</b> → 嵌入式操作系统 → 应用层。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">实时与内核</div>
+        <p><b>硬实时 VxWorks</b>（错过截止期即失败）vs 软实时 Android；宏内核（Linux）vs 微内核（Minix、QNX）。</p></div>
+      <div class="card red rv" style="--d:.19s"><div class="c-title">RMS 速率单调调度</div>
+        <p>静态优先级，周期越短优先级越高。</p>
+        <div class="formula">Σ Eᵢ/Tᵢ ≤ n(2^(1/n) − 1) ≈ 69.3%</div>
+        <p>是<b>充分非必要</b>条件，超限未必不可调度。</p></div>
+      <div class="card rv" style="--d:.26s"><div class="c-title">EDF 最早截止期</div>
+        <p>动态优先级，CPU 利用率理论上限 <b>100%</b>，但运行期开销大、实现复杂。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">优先级反转</div>
+        <p><b>优先级继承协议</b>：存在阻塞链；<b>优先级天花板协议</b>：直接抬到天花板，可避免死锁与链式阻塞。</p></div>
+      <div class="card teal rv" style="--d:.4s"><div class="c-title">选型与可靠性</div>
+        <p>RTOS：KB 级体积、毫秒级启动；嵌入式 Linux：生态丰富、适合端侧 AI。容错：TMR 三模冗余 vs 监控-启动器（双机）。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P29 第18章 移动 ============ -->
+  <section class="slide">
+    <div class="ch-ghost">18</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 18 · 移动互联网开发</div><div class="ch-freq">平台 · 跨端 · 案例</div></div>
+    <div class="ch-title rv"><h2>架构演进 · 三大平台 · 跨端方案</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">App 架构演进</div>
+        <p>单体 → MVC → MVP → MVVM → 移动微服务化。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">移动平台全家桶</div>
+        <p>阿里 mPaaS、腾讯 TMF、华为 EMAS、美团 EMOP；小程序容器代表 <b>FinClip</b>。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">生态差异</div>
+        <p>微信 vs 支付宝小程序（流量/支付基因不同）；Android vs iOS 在七方面存在差异（权限/分发/语言…）。</p></div>
+      <div class="card red rv" style="--d:.26s"><div class="c-title">跨端性能排序（记顺序）</div>
+        <p><b>原生 &gt; 桥接（RN/Weex）&gt; Flutter（自绘）&gt; Hybrid 混合 &gt; Web App</b>；体验与开发效率的权衡。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">Java 基础辨析</div>
+        <div class="formula">JDK ⊃ JRE ⊃ JVM</div>
+        <p>开发工具包包含运行环境，运行环境包含虚拟机。</p></div>
+      <div class="card teal rv" style="--d:.4s"><div class="c-title">案例方向</div>
+        <p>移动后端微服务拆分后的<b>数据一致性</b>：强一致 2PC vs 最终一致（可靠消息），按资金/非资金场景选型。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P30 第19章 大数据 ============ -->
+  <section class="slide">
+    <div class="ch-ghost">19</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 19 · 大数据处理</div><div class="ch-freq">Lambda / Kappa 必考对比</div></div>
+    <div class="ch-title rv"><h2>4V 特征 · 两类架构 · 生态工具</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">4V 特征</div>
+        <p>数据量大 Volume、类型多 Variety、速度快 Velocity、价值密度低 Value。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">大数据处理 6 原则</div>
+        <p>伸缩性、可靠性、容错、低延迟、可扩展、成本效率（围绕集群与数据本地性）。</p></div>
+      <div class="card teal rv" style="--d:.19s"><div class="c-title">Lambda 架构</div>
+        <p><b>批处理层</b>（全量、精确）+ <b>加速层</b>（实时流）+ 服务层合并查询。</p>
+        <p>缺点：两套代码、维护成本高。</p></div>
+      <div class="card teal rv" style="--d:.26s"><div class="c-title">Kappa 架构</div>
+        <p>纯流式架构，用 <b>Kafka/Pulsar 日志重放</b>代替批处理层重算历史，一套代码。</p></div>
+      <div class="card red rv" style="--d:.33s"><div class="c-title">易错点辨析</div>
+        <p>流处理保<b>实时性</b>、批处理保<b>最终一致性/精确</b>；需要频繁<b>历史数据重算</b>时 Lambda 更占优。</p></div>
+      <div class="card rv" style="--d:.4s"><div class="c-title">IOTA 与生态</div>
+        <p>IOTA：边缘采集、去 ETL；采集同步 Sqoop/DataX；流计算 Flink Watermark 处理乱序；图计算 GraphX。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P31 第20章 微服务（上） ============ -->
+  <section class="slide">
+    <div class="ch-ghost">20</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 20 · 微服务架构（上）</div><div class="ch-freq">近年最热 · 案例常客</div></div>
+    <div class="ch-title rv"><h2>拆分原则 · DDD · 通信与治理</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">微服务 vs 单体</div>
+        <p>优点：独立部署、技术异构、故障隔离、按需伸缩；缺点：分布式复杂度、运维成本高。<b>不是所有系统都适合</b>。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">拆分原则</div>
+        <p>单一职责、服务自治、按业务能力拆分；用 <b>DDD 限界上下文</b>划边界，避免过度拆分（100+ 服务反模式）。</p></div>
+      <div class="card red rv" style="--d:.19s"><div class="c-title">原则辨析题</div>
+        <p>去中心化治理与数据管理才是微服务特征；<b>"集中式治理"不属于</b>微服务原则（2025 考点）。</p></div>
+      <div class="card teal rv" style="--d:.26s"><div class="c-title">同步 vs 异步</div>
+        <p>同步 RESTful/gRPC：强实时，如<b>下单调用支付</b>；异步 Kafka：解耦削峰。全链路同步有雪崩级联风险。</p></div>
+      <div class="card rv" style="--d:.33s"><div class="c-title">案例三主线</div>
+        <p><b>怎么拆</b>（边界）→ <b>数据怎么一致</b>（分布式事务）→ <b>拆完怎么管</b>（治理）。</p></div>
+      <div class="card teal rv" style="--d:.4s"><div class="c-title">Service Mesh</div>
+        <p>服务网格：控制面 + 数据面 Sidecar，把熔断/限流/追踪从业务代码下沉到基础设施层。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P32 第20章 微服务（下） ============ -->
+  <section class="slide">
+    <div class="ch-ghost">20</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 20 · 微服务架构（下）</div><div class="ch-freq">分布式事务 · 容错 · 安全</div></div>
+    <div class="ch-title rv"><h2>BASE · 可靠消息 · 断路器 · 容器化</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">2PC 的边界</div>
+        <p>两阶段提交强一致，但<b>同步阻塞、协调者单点、可能死锁</b>，不适合互联网高并发场景。</p></div>
+      <div class="card rv" style="--d:.12s"><div class="c-title">BASE 理论</div>
+        <p>基本可用、软状态、<b>最终一致性</b>；用短时间的不一致换取高可用与吞吐。</p></div>
+      <div class="card red rv" style="--d:.19s"><div class="c-title">分布式事务三件套</div>
+        <p><b>可靠消息</b>（本地消息表 + MQ）、<b>TCC</b>（Try-Confirm-Cancel）、<b>Saga</b>（长事务+补偿）。</p></div>
+      <div class="card teal rv" style="--d:.26s"><div class="c-title">资金场景选型</div>
+        <p>强一致资金链路可用 <b>Seata AT</b>；异步场景用 <b>RocketMQ 事务消息</b>保障本地操作与发消息原子性。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">容错与注册中心</div>
+        <p>容错四机制 + <b>断路器</b>（Hystrix / Sentinel）防雪崩；注册中心：Consul、ZooKeeper(ZAB)、Eureka、Etcd(Raft)。</p></div>
+      <div class="card rv" style="--d:.4s"><div class="c-title">交付与安全</div>
+        <p>Docker 容器 + Kubernetes 编排 + Jenkins 流水线；OAuth2 四授权模式；<b>JWT 三段式（Header.Payload.Signature）无状态令牌</b>。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P33 第21章 CPS ============ -->
+  <section class="slide">
+    <div class="ch-ghost">21</div>
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 21 · 信息物理系统 CPS</div><div class="ch-freq">2025 英语题出处</div></div>
+    <div class="ch-title rv"><h2>3C 融合 · 闭环赋能 · 通信协议</h2></div>
+    <div class="grid g32">
+      <div class="card rv" style="--d:.05s"><div class="c-title">3C 融合</div>
+        <p>计算 Computation、通信 Communication、控制 Control 深度融合，物理世界与信息世界互联。</p></div>
+      <div class="card red rv" style="--d:.12s"><div class="c-title">闭环赋能体系</div>
+        <p>状态感知 → 实时分析 → 科学决策 → <b>精准执行</b>，循环迭代（2025 专业英语题）。</p></div>
+      <div class="card rv" style="--d:.19s"><div class="c-title">三个层级</div>
+        <p>单元级（设备自感知）→ 系统级（产线/车间互联）→ <b>系统之系统 SoS</b>（跨域协同）。</p></div>
+      <div class="card rv" style="--d:.26s"><div class="c-title">十大特质与核心</div>
+        <p>CPS 十大技术特质（异构连接、分布式、自治协同…）；<b>工业软件是 CPS 的核心</b>，数字孪生是镜像映射。</p></div>
+      <div class="card teal rv" style="--d:.33s"><div class="c-title">边缘 / 雾计算</div>
+        <p>计算下沉到靠近数据源处，降低时延与带宽压力，支撑实时控制与本地自治。</p></div>
+      <div class="card teal rv" style="--d:.4s"><div class="c-title">通信参数记忆点</div>
+        <p>NFC：10cm、13.56MHz；ZigBee：802.15.4、1mW、AES-128；LoRa Class A 最节能必选；5G：eMBB / mMTC / uRLLC。</p></div>
+    </div>
+  </section>
+
+  <!-- ============ P34 第22章 论文 ============ -->
+  <section class="slide">
+    <div class="ch-head rv"><div class="ch-chip">CHAPTER 22 · 论文写作专题</div><div class="ch-freq">75 分 · 45 分及格 · 120 分钟</div></div>
+    <div class="ch-title rv"><h2>时间分配 · 字数评分 · 六要诀</h2></div>
+    <div class="split">
+      <div class="panel rv" style="--d:.05s">
+        <div class="p-title">120 分钟时间分配</div>
+        <div class="timeline">
+          <div class="tl-item"><div class="tl-time">3 min</div><div class="tl-bar-wrap"><div class="tl-label"><span>选题（三选一，先看熟题）</span></div><div class="tl-track"><div class="tl-fill" style="--w:3.75%"></div></div></div></div>
+          <div class="tl-item"><div class="tl-time">12 min</div><div class="tl-bar-wrap"><div class="tl-label"><span>构思列提纲</span></div><div class="tl-track"><div class="tl-fill" style="--w:15%"></div></div></div></div>
+          <div class="tl-item"><div class="tl-time">15 min</div><div class="tl-bar-wrap"><div class="tl-label"><span>写摘要 300～400 字</span></div><div class="tl-track"><div class="tl-fill" style="--w:18.75%"></div></div></div></div>
+          <div class="tl-item"><div class="tl-time">80 min</div><div class="tl-bar-wrap"><div class="tl-label"><span>正文 2000～3000 字（最佳约 2500）</span></div><div class="tl-track"><div class="tl-fill" style="--w:100%"></div></div></div></div>
+          <div class="tl-item"><div class="tl-time">10 min</div><div class="tl-bar-wrap"><div class="tl-label"><span>检查修改</span></div><div class="tl-track"><div class="tl-fill" style="--w:12.5%"></div></div></div></div>
+        </div>
+        <div class="warnbox"><b>两条不及格红线：</b>摘要少于 120 字、正文少于 1200 字直接不及格。</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px;min-height:0;">
+        <div class="panel rv" style="--d:.15s;flex:1">
+          <div class="p-title">评分权重（75 分制，45 分及格）</div>
+          <div class="kv">
+            <div><b>切合题意 30%</b>　·　应用深度与水平 20%　·　实践性 20%</div>
+            <div>表达能力 15%　·　综合分析能力 15%</div>
+            <div>有<span class="hl">独到见解、贴合新趋势</span>可加 <b>5～10 分</b>；60 分以上为优良。</div>
+          </div>
+        </div>
+        <div class="panel rv" style="--d:.25s;flex:1.15">
+          <div class="p-title">六要诀 & 失分点</div>
+          <div class="grid g2" style="gap:8px 20px;display:grid;grid-template-columns:1fr 1fr">
+            <div style="font-size:13px;color:var(--muted);line-height:1.7"><span class="hl">✔</span> 提前备好一个可复用项目模板<br><span class="hl">✔</span> 摘要最后写或先写都要覆盖正文<br><span class="hl">✔</span> 论点 + 真实数据 + 具体措施</div>
+            <div style="font-size:13px;color:var(--muted);line-height:1.7"><span class="hl-r">✘</span> 走题、通篇纯理论、虚构情节<br><span class="hl-r">✘</span> 口语化（如"我们公司"）、项目超 3 年<br><span class="hl-r">✘</span> 段落超过 8 行、卷面潦草</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ P35 结语 ============ -->
+  <section class="slide">
+    <div class="ch-head rv"><div class="ch-chip">FINAL · 备考路线</div><div class="ch-freq">理解应用 ＞ 机械背诵</div></div>
+    <div class="ch-title rv"><h2>三阶段冲刺路线</h2><span class="en">Roadmap</span></div>
+    <div class="route">
+      <div class="step rv" style="--d:.1s">
+        <div class="s-no">壹</div><h3>基础精读</h3><div class="s-time">第 1 阶段 · 教材轮</div>
+        <ul><li>通读官方教程 22 章，建立四板块框架</li><li>边读边画思维导图，对比表先行</li><li>每章配套选择题趁热巩固</li></ul>
+      </div>
+      <div class="step rv" style="--d:.25s">
+        <div class="s-no">贰</div><h3>专项突破</h3><div class="s-time">第 2 阶段 · 真题轮</div>
+        <ul><li>六大计算题题型刷到条件反射</li><li>案例四题型逐个攻克（DFD/库/UML/架构）</li><li>近三年真题按知识域归类复盘</li></ul>
+      </div>
+      <div class="step rv" style="--d:.4s">
+        <div class="s-no">叁</div><h3>模拟冲刺</h3><div class="s-time">第 3 阶段 · 模考轮</div>
+        <ul><li>限时整卷模拟，控制选择题节奏</li><li>手写论文至少 2 篇并卡 120 分钟</li><li>回看错题本与高频对比表</li></ul>
+      </div>
+    </div>
+    <div class="quote-block rv" style="--d:.55s">
+      <div class="big">理解应用 ＞ 机械背诵</div>
+      <div class="cite">"系统规划是信息系统建设成功的关键，它比具体项目的开发更为重要。"<br>—— 祝顺利通关软考高级 · 系统分析师</div>
+    </div>
+  </section>
+
+  </div><!-- /#deck -->
+
+  <button class="nav-btn" id="prev" aria-label="上一页">‹</button>
+  <button class="nav-btn" id="next" aria-label="下一页">›</button>
+  <div id="pager"><b id="cur">1</b> / <span id="total">35</span></div>
+  <div id="hint">← → / 空格 翻页 · Home / End 首末页 · 滚轮 / 滑动</div>
+</div>
+
+<script>
+(function(){
+  var slides = document.querySelectorAll('.slide');
+  var total = slides.length;
+  var idx = 0, locked = false;
+  var curEl = document.getElementById('cur');
+  var totalEl = document.getElementById('total');
+  var progress = document.getElementById('progress');
+  totalEl.textContent = total;
+
+  function clamp(n){ return Math.max(0, Math.min(total-1, n)); }
+  function go(n, push){
+    n = clamp(n);
+    if(n === idx && push !== undefined) return;
+    slides[idx].classList.remove('active');
+    idx = n;
+    slides[idx].classList.add('active');
+    curEl.textContent = idx+1;
+    progress.style.width = ((idx+1)/total*100) + '%';
+    if(push !== false && location.hash !== '#/'+(idx+1)){
+      history.replaceState(null,'','#/'+(idx+1));
+    }
+  }
+  function next(){ go(idx+1); }
+  function prev(){ go(idx-1); }
+
+  // 从 hash 恢复页码
+  var m = location.hash.match(/^#\/(\d+)$/);
+  if(m){ go(clamp(parseInt(m[1],10)-1), false); } else { go(0,false); }
+
+  document.getElementById('next').addEventListener('click', next);
+  document.getElementById('prev').addEventListener('click', prev);
+
+  document.addEventListener('keydown', function(e){
+    if(e.key==='ArrowRight'||e.key==='PageDown'||e.key===' '||e.key==='Enter'){ e.preventDefault(); next(); }
+    else if(e.key==='ArrowLeft'||e.key==='PageUp'||e.key==='Backspace'){ e.preventDefault(); prev(); }
+    else if(e.key==='Home'){ go(0); }
+    else if(e.key==='End'){ go(total-1); }
+  });
+
+  // 滚轮（带锁防抖）
+  window.addEventListener('wheel', function(e){
+    if(locked) return;
+    if(Math.abs(e.deltaY) < 24) return;
+    locked = true;
+    e.deltaY > 0 ? next() : prev();
+    setTimeout(function(){ locked=false; }, 650);
+  }, {passive:true});
+
+  // 触摸滑动
+  var sx=0, sy=0;
+  window.addEventListener('touchstart', function(e){
+    sx = e.touches[0].clientX; sy = e.touches[0].clientY;
+  }, {passive:true});
+  window.addEventListener('touchend', function(e){
+    var dx = e.changedTouches[0].clientX - sx;
+    var dy = e.changedTouches[0].clientY - sy;
+    if(Math.abs(dx) > 55 && Math.abs(dx) > Math.abs(dy)){ dx < 0 ? next() : prev(); }
+  }, {passive:true});
+
+  window.addEventListener('hashchange', function(){
+    var mm = location.hash.match(/^#\/(\d+)$/);
+    if(mm){ go(clamp(parseInt(mm[1],10)-1), false); }
+  });
+})();
+</script>
+</body>
+</html>
