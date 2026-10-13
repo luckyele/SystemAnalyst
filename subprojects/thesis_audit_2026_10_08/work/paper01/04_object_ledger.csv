@@ -1,0 +1,31 @@
+paper_id,object_ledger_id,object_type,pdf_page,thesis_page,page_region,section,object_id,object_title,original_excerpt,extraction_confidence,needs_visual_check,notes
+paper01,OBJ-001,section,不适用,行1-7,front,S00,标题摘要,标题与摘要,"自2018年文化和旅游部组建以来……四个阶段",high,no,ISSUE-001/008 定位
+paper01,OBJ-002,section,不适用,行9,front,S01,导言段,导言段,"研究发现：我国已形成以规划为引领……",high,no,ISSUE-008 定位
+paper01,OBJ-003,section,不适用,行11-21,body,S10,研究背景,一、研究背景与问题的提出,high,no,
+paper01,OBJ-004,section,不适用,行23-51,body,S20,演进历程,二、文旅融合政策的演进历程,high,no,四阶段小节
+paper01,OBJ-005,section,不适用,行53-85,body,S30,政策体系,三、现行政策体系的结构分析,high,no,五位一体结构
+paper01,OBJ-006,section,不适用,行87-105,body,S40,实施成效,四、政策实施成效的实证观察,high,no,数据密集区
+paper01,OBJ-007,section,不适用,行107-135,body,S50,问题诊断,五、政策执行中的突出问题与成因分析,high,no,
+paper01,OBJ-008,section,不适用,行137-145,body,S60,国际比较,六、国际经验比较与镜鉴,high,no,ISSUE-003 定位
+paper01,OBJ-009,section,不适用,行147-167,body,S70,政策建议,七、政策优化的路径与建议,high,no,五条路径
+paper01,OBJ-010,section,不适用,行169-173,body,S80,结论展望,八、结论与展望,high,no,ISSUE-002/011/014 定位
+paper01,OBJ-011,reference_block,不适用,行175-227,back,参考文献,REF-LIST,参考文献[1]-[26],high,no,脚本核验与正文双向匹配一致
+paper01,OBJ-012,reference_block,不适用,行229-255,back,Sources,SOURCES,Sources 链接列表26条,high,no,ISSUE-013 定位
+paper01,OBJ-013,method,不适用,行5/21/23-85,body,M-01,政策文本分析,综合运用政策文本分析,high,no,方法画像 M-01
+paper01,OBJ-014,method,不适用,行91-97,body,M-02,统计数据实证,统计数据实证与典型案例考察,high,no,方法画像 M-02
+paper01,OBJ-015,method,不适用,行93/101,body,M-03,典型案例考察,四种典型模式,high,no,方法画像 M-03
+paper01,OBJ-016,method,不适用,行141-145,body,M-04,国际比较研究,主要国家的文化旅游融合政策实践,high,no,方法画像 M-04
+paper01,OBJ-017,data_claim,不适用,行17/91,body,S10/S40,CLM-001,2024文化产业增加值,文化及相关产业增加值达62094亿元占4.61%,high,no,外部核验 verified
+paper01,OBJ-018,data_claim,不适用,行17/91,body,S10/S40,CLM-002,2024旅游产业增加值,旅游及相关产业增加值58631亿元占4.35%,high,no,外部核验 verified
+paper01,OBJ-019,data_claim,不适用,行91/171,body,S40/S80,CLM-003,两产业合计接近9%,两大产业合计贡献接近GDP的9%,high,no,ISSUE-002 加总口径
+paper01,OBJ-020,data_claim,不适用,行97/171,body,S40/S80,CLM-004,2025国内出游,65.22亿人次6.30万亿元增长16.2%和9.5%,high,no,ISSUE-006 基数复算
+paper01,OBJ-021,data_claim,不适用,行81/171,body,S40/S80,CLM-005,2025入境旅游,突破1.5亿人次超1300亿美元,high,no,外部核验 verified
+paper01,OBJ-022,data_claim,不适用,行79,body,S30,CLM-006,免签政策,对50国单方面免签过境免签55国,high,no,ISSUE-009 时点
+paper01,OBJ-023,data_claim,不适用,行75,body,S30,CLM-008,2025国庆出游,8.88亿人次8090.06亿元,high,no,外部核验 verified 含增量复算
+paper01,OBJ-024,data_claim,不适用,行75,body,S30,CLM-009,2026国庆流动,跨区域人员流动21.42亿人次,high,no,外部核验 verified
+paper01,OBJ-025,data_claim,不适用,行93,body,S40,CLM-011,浮梁县域数据,773.70万人次80.53亿元接近GDP四成,high,no,ISSUE-007 口径与官方预计数差异
+paper01,OBJ-026,data_claim,不适用,行101,body,S40,CLM-010,世界遗产,景德镇手工瓷业遗存第61项世界遗产,high,no,外部核验 verified；浮梁片区占比未核实
+paper01,OBJ-027,data_claim,不适用,行91,body,S40,CLM-013,2024景区数据,16541个67.6亿人次4814.2亿元,high,no,外部核验 verified
+paper01,OBJ-028,data_claim,不适用,行37,body,S20,CLM-012,2019国内旅游,60.06亿人次5.73万亿元,high,no,外部核验 verified
+paper01,OBJ-029,data_claim,不适用,行81,body,S40,CLM-007,2026上半年入境,2291.4万人次77.7%免签,high,no,外部核验 verified
+paper01,OBJ-030,data_claim,不适用,行97/171,body,S40/S80,CLM-015,核心强结论,支柱产业地位初步确立/充分印证,high,no,依赖 CLM-003 口径成立
