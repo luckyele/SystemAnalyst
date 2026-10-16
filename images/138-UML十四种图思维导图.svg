@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 836" width="720" height="836" role="img" aria-label="UML 十四种图思维导图：结构图七种与行为图七种，五种常用图高亮">
+  <style>
+    text { font-family: "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif; }
+    .t-title { font-size: 16px; font-weight: 600; fill: #171717; }
+    .t-cap { font-size: 12px; fill: #52525B; }
+    .t-name { font-size: 14px; font-weight: 500; fill: #171717; }
+    .t-desc { font-size: 12px; fill: #52525B; }
+    .t-brand { fill: #004D26; }
+    .edge { fill: none; stroke: #9A9AA0; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+    .node-box { fill: #FFFFFF; stroke: #DCDCE0; }
+    .root-box { fill: #B4FDD9; stroke: #0FDC78; }
+    .focus-box { fill: #E5FFF2; stroke: #6BDCA7; }
+    .capsule { fill: #FFFFFF; stroke: #DCDCE0; }
+  </style>
+  <defs>
+    <pattern id="mindGrid" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#C9C9CD" />
+    </pattern>
+  </defs>
+  <rect x="0" y="0" width="720" height="836" fill="#F7F7F8" />
+  <rect x="0" y="0" width="720" height="836" fill="url(#mindGrid)" />
+
+  <text class="t-title" x="24" y="32">UML 十四种图 · 思维导图</text>
+  <rect x="556" y="12" width="140" height="26" rx="13" fill="#E5FFF2" stroke="#9FF1C9" />
+  <circle cx="572" cy="25" r="4" fill="#0FDC78" />
+  <text x="582" y="29" font-size="12" font-weight="500" fill="#004D26">最常用 5 种</text>
+
+  <g transform="translate(0 48)">
+    <path class="edge" d="M148 399 H170 Q178 399 178 391 V200 Q178 192 186 192 H200" />
+    <path class="edge" d="M148 399 H170 Q178 399 178 407 V569 Q178 577 186 577 H200" />
+
+    <path class="edge" d="M304 192 H322 Q330 192 330 184 V62 Q330 54 338 54 H356" />
+    <path class="edge" d="M304 192 H322 Q330 192 330 184 V108 Q330 100 338 100 H356" />
+    <path class="edge" d="M304 192 H322 Q330 192 330 184 V154 Q330 146 338 146 H356" />
+    <path class="edge" d="M304 192 H356" />
+    <path class="edge" d="M304 192 H322 Q330 192 330 200 V230 Q330 238 338 238 H356" />
+    <path class="edge" d="M304 192 H322 Q330 192 330 200 V276 Q330 284 338 284 H356" />
+    <path class="edge" d="M304 192 H322 Q330 192 330 200 V322 Q330 330 338 330 H356" />
+
+    <path class="edge" d="M304 577 H322 Q330 577 330 569 V450 Q330 442 338 442 H356" />
+    <path class="edge" d="M304 577 H322 Q330 577 330 569 V496 Q330 488 338 488 H356" />
+    <path class="edge" d="M304 577 H322 Q330 577 330 569 V542 Q330 534 338 534 H356" />
+    <path class="edge" d="M304 577 H322 Q330 577 330 585 V598 Q330 606 338 606 H356" />
+    <path class="edge" d="M304 577 H322 Q330 577 330 585 V644 Q330 652 338 652 H356" />
+    <path class="edge" d="M304 577 H322 Q330 577 330 585 V690 Q330 698 338 698 H356" />
+    <path class="edge" d="M304 577 H322 Q330 577 330 585 V736 Q330 744 338 744 H356" />
+
+    <g>
+      <rect class="root-box" x="28" y="367" width="120" height="64" rx="8" />
+      <text class="t-name t-brand" x="88" y="396" text-anchor="middle" font-weight="600">UML 图</text>
+      <text class="t-cap t-brand" x="88" y="416" text-anchor="middle">两大类 · 14 种</text>
+    </g>
+
+    <g>
+      <rect class="node-box" x="200" y="170" width="104" height="44" rx="8" />
+      <text class="t-name" x="252" y="189" text-anchor="middle">结构图</text>
+      <text class="t-cap" x="252" y="205" text-anchor="middle">静态 · 7 种</text>
+    </g>
+
+    <g>
+      <rect class="node-box" x="200" y="555" width="104" height="44" rx="8" />
+      <text class="t-name" x="252" y="574" text-anchor="middle">行为图</text>
+      <text class="t-cap" x="252" y="590" text-anchor="middle">动态 · 7 种</text>
+    </g>
+
+    <g>
+      <rect class="focus-box" x="356" y="36" width="336" height="36" rx="8" />
+      <text x="368" y="59"><tspan class="t-name t-brand">类图</tspan><tspan class="t-desc" dx="10">泛化·实现·组合·聚合·关联·依赖</tspan></text>
+    </g>
+    <g>
+      <rect class="node-box" x="356" y="82" width="336" height="36" rx="8" />
+      <text x="368" y="105"><tspan class="t-name">对象图</tspan><tspan class="t-desc" dx="10">类图的实例快照</tspan></text>
+    </g>
+    <g>
+      <rect class="node-box" x="356" y="128" width="336" height="36" rx="8" />
+      <text x="368" y="151"><tspan class="t-name">组件图</tspan><tspan class="t-desc" dx="10">可部署替换的物理模块</tspan></text>
+    </g>
+    <g>
+      <rect class="node-box" x="356" y="174" width="336" height="36" rx="8" />
+      <text x="368" y="197"><tspan class="t-name">部署图</tspan><tspan class="t-desc" dx="10">软件到硬件的映射</tspan></text>
+    </g>
+    <g>
+      <rect class="node-box" x="356" y="220" width="336" height="36" rx="8" />
+      <text x="368" y="243"><tspan class="t-name">包图</tspan><tspan class="t-desc" dx="10">分组结构与依赖</tspan></text>
+    </g>
+    <g>
+      <rect class="node-box" x="356" y="266" width="336" height="36" rx="8" />
+      <text x="368" y="289"><tspan class="t-name">组合结构图</tspan><tspan class="t-desc" dx="10">类的内部构成</tspan></text>
+    </g>
+    <g>
+      <rect class="node-box" x="356" y="312" width="336" height="36" rx="8" />
+      <text x="368" y="335"><tspan class="t-name">剖面图</tspan><tspan class="t-desc" dx="10">UML 扩展机制</tspan></text>
+    </g>
+
+    <g>
+      <rect class="capsule" x="356" y="392" width="132" height="24" rx="12" />
+      <text class="t-cap" x="422" y="408" text-anchor="middle" font-weight="500">通用行为图 · 3 种</text>
+    </g>
+    <g>
+      <rect class="focus-box" x="356" y="424" width="336" height="36" rx="8" />
+      <text x="368" y="447"><tspan class="t-name t-brand">用例图</tspan><tspan class="t-desc" dx="10">功能视图 · 需求分析</tspan></text>
+    </g>
+    <g>
+      <rect class="focus-box" x="356" y="470" width="336" height="36" rx="8" />
+      <text x="368" y="493"><tspan class="t-name t-brand">活动图</tspan><tspan class="t-desc" dx="10">执行流程 · 支持并发</tspan></text>
+    </g>
+    <g>
+      <rect class="focus-box" x="356" y="516" width="336" height="36" rx="8" />
+      <text x="368" y="539"><tspan class="t-name t-brand">状态机图</tspan><tspan class="t-desc" dx="10">状态与事件驱动</tspan></text>
+    </g>
+
+    <g>
+      <rect class="capsule" x="356" y="556" width="96" height="24" rx="12" />
+      <text class="t-cap" x="404" y="572" text-anchor="middle" font-weight="500">交互图 · 4 种</text>
+    </g>
+    <g>
+      <rect class="focus-box" x="356" y="588" width="336" height="36" rx="8" />
+      <text x="368" y="611"><tspan class="t-name t-brand">序列图</tspan><tspan class="t-desc" dx="10">按时间排序的消息</tspan></text>
+    </g>
+    <g>
+      <rect class="node-box" x="356" y="634" width="336" height="36" rx="8" />
+      <text x="368" y="657"><tspan class="t-name">通信图</tspan><tspan class="t-desc" dx="10">链接结构 · 编号消息</tspan></text>
+    </g>
+    <g>
+      <rect class="node-box" x="356" y="680" width="336" height="36" rx="8" />
+      <text x="368" y="703"><tspan class="t-name">定时图</tspan><tspan class="t-desc" dx="10">时间约束 · 实时系统</tspan></text>
+    </g>
+    <g>
+      <rect class="node-box" x="356" y="726" width="336" height="36" rx="8" />
+      <text x="368" y="749"><tspan class="t-name">交互概览图</tspan><tspan class="t-desc" dx="10">活动图骨架嵌交互</tspan></text>
+    </g>
+  </g>
+</svg>
