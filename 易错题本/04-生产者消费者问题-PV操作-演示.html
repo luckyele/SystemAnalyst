@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>生产者-消费者问题 · PV 操作 交互演示</title>
+<style>
+  :root{
+    --bg:#f5f6fb; --panel:#fff; --ink:#1f2233; --muted:#6b7086; --line:#e4e6f0;
+    --indigo:#4f46e5; --indigo-soft:#eef0ff;
+    --green:#0ea472; --green-soft:#e7f7f1;
+    --red:#e0483c; --red-soft:#fdeceb;
+    --amber:#d98a00; --amber-soft:#fdf3e0;
+    --cyan:#0b7fa8; --cyan-soft:#e4f4fa;
+    --shadow:0 1px 2px rgba(31,34,51,.06),0 8px 24px -12px rgba(31,34,51,.18);
+    --mono:"SF Mono","JetBrains Mono","Cascadia Code",Consolas,"Courier New",monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+    line-height:1.6;-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 20px 64px}
+
+  header{background:linear-gradient(135deg,#0f766e 0%,#0e9f8a 45%,#22b8a0 100%);color:#fff;padding:34px 20px 30px;margin-bottom:26px}
+  header .inner{max-width:1100px;margin:0 auto}
+  header .tag{display:inline-block;font-size:12px;letter-spacing:.14em;background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.3);padding:3px 11px;border-radius:999px;margin-bottom:12px}
+  header h1{margin:0 0 8px;font-size:26px}
+  header p{margin:0;font-size:14px;color:rgba(255,255,255,.85);max-width:800px}
+
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow);margin-bottom:20px}
+  .card h2{font-size:15px;margin:0 0 16px;display:flex;align-items:center;gap:9px}
+  .card h2 .num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;
+    border-radius:6px;background:var(--indigo);color:#fff;font-size:12px;font-family:var(--mono);flex:none}
+  .hint{font-size:12.5px;color:var(--muted);font-weight:400;margin-left:auto}
+
+  .btn{font:inherit;font-size:13px;padding:8px 15px;border-radius:9px;cursor:pointer;border:1px solid var(--line);
+    background:#fff;color:var(--ink);transition:.15s}
+  .btn:hover{border-color:var(--indigo);color:var(--indigo)}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.prod{background:var(--green);border-color:var(--green);color:#fff}
+  .btn.prod:hover:not(:disabled){background:#0b8a60;color:#fff}
+  .btn.cons{background:var(--cyan);border-color:var(--cyan);color:#fff}
+  .btn.cons:hover:not(:disabled){background:#096a8d;color:#fff}
+  .btn.primary{background:var(--indigo);border-color:var(--indigo);color:#fff}
+  .btn.primary:hover:not(:disabled){background:#4338ca;color:#fff}
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+  .toolbar .sep{width:1px;height:24px;background:var(--line);margin:0 4px}
+  .ctl{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+  input[type=range]{width:130px;accent-color:var(--indigo)}
+
+  /* 三信号量 */
+  .sems{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+  @media(max-width:640px){.sems{grid-template-columns:1fr}}
+  .sem{border-radius:12px;padding:13px 16px;border:1px solid var(--line);transition:.25s;background:#fafbff}
+  .sem .name{font-family:var(--mono);font-size:13px;font-weight:600;color:#3a3f96;display:flex;justify-content:space-between;align-items:center}
+  .sem .init{font-size:11px;color:var(--muted)}
+  .sem .val{font-family:var(--mono);font-size:30px;font-weight:700;line-height:1.15;margin-top:2px;transition:.2s}
+  .sem .role{font-size:11.5px;color:var(--muted)}
+  .sem.empty-c{background:var(--green-soft);border-color:#c6ece0}   .sem.empty-c .val{color:var(--green)}
+  .sem.full-c{background:var(--cyan-soft);border-color:#bfe6f2}     .sem.full-c .val{color:var(--cyan)}
+  .sem.mutex-c{background:var(--amber-soft);border-color:#f0dcb0}   .sem.mutex-c .val{color:var(--amber)}
+  .sem.flash{transform:scale(1.045);box-shadow:0 8px 20px -10px rgba(31,34,51,.5)}
+  .invariant{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .bar{flex:1 1 240px;height:12px;border-radius:999px;background:var(--green);overflow:hidden;display:flex;min-width:180px}
+  .bar i{display:block;height:100%;background:var(--cyan);transition:.3s}
+
+  /* 缓冲区 */
+  .buffer{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:6px}
+  .slot{width:88px;height:80px;border-radius:12px;border:2px dashed #cdd2e6;background:#fafbff;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;transition:.3s;position:relative}
+  .slot.filled{border-style:solid;border-color:var(--cyan);background:var(--cyan-soft)}
+  .slot .idx{position:absolute;top:4px;left:7px;font-family:var(--mono);font-size:10.5px;color:#9aa0b5}
+  .slot .content{font-family:var(--mono);font-size:19px;font-weight:700;color:var(--cyan)}
+  .slot .lbl{font-size:11px;color:var(--muted)}
+  .slot.pop{animation:pop .45s ease}
+  @keyframes pop{0%{transform:scale(1)}35%{transform:scale(1.14)}100%{transform:scale(1)}}
+  .slot.err{border-color:var(--red);background:var(--red-soft);animation:shake .4s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+  .buf-empty{font-size:13px;color:var(--muted)}
+
+  .flying{font-size:12px;color:var(--muted);margin-top:8px;min-height:20px}
+
+  /* 两栏：代码 + 日志 */
+  .cols{display:grid;grid-template-columns:1.15fr 1fr;gap:20px}
+  @media(max-width:820px){.cols{grid-template-columns:1fr}}
+  .codeblock{font-family:var(--mono);font-size:12.8px;background:#1c2033;color:#d7dbf0;
+    border-radius:11px;padding:14px 16px;overflow-x:auto;line-height:1.85}
+  .codeblock .cmt{color:#7d86a8}
+  .codeblock .kw{color:#c792ea}
+  .codeblock .fn{color:#82d2ff}
+  .codeblock .call{color:#ffd479}
+  .codeblock .ln{display:block;white-space:pre;border-radius:5px;padding:0 6px;margin:0 -6px;transition:.2s}
+  .codeblock .ln.hl{background:rgba(255,212,121,.20);box-shadow:inset 3px 0 0 #ffd479}
+  .codeblock .blank{color:#7ee7c7;border-bottom:1.5px solid #7ee7c7;padding:0 2px}
+  .codeblock .blank.hide{color:#4a5273;border-color:#4a5273}
+  .code-title{font-size:12.5px;font-weight:600;color:var(--muted);margin:0 0 8px;display:flex;justify-content:space-between;align-items:center}
+
+  .log{height:290px;overflow-y:auto;border:1px solid var(--line);border-radius:11px;padding:10px 12px;background:#fafbff;font-size:12.5px}
+  .log .item{padding:5px 8px;border-radius:7px;margin-bottom:5px;border-left:3px solid var(--line);background:#fff;
+    font-family:var(--mono);display:flex;gap:8px;align-items:baseline}
+  .log .item .who{font-weight:700;font-size:11.5px;flex:none;padding:1px 7px;border-radius:999px}
+  .log .item.prod{border-left-color:var(--green)} .log .item.prod .who{background:var(--green-soft);color:var(--green)}
+  .log .item.cons{border-left-color:var(--cyan)}  .log .item.cons .who{background:var(--cyan-soft);color:var(--cyan)}
+  .log .item.block{border-left-color:var(--red);background:var(--red-soft)}
+  .log .item.block .who{background:#f7c8c3;color:#b32f24}
+  .log .item .txt{color:#3a3f60}
+  .log .item .sv{color:#8a90ad;margin-left:auto;font-size:11.5px}
+  .log .empty{color:var(--muted);font-size:12.5px;text-align:center;padding:18px 0}
+
+  /* 铁律 */
+  .rules{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:720px){.rules{grid-template-columns:1fr}}
+  .rule{border-radius:11px;padding:14px 16px;font-size:13px;border:1px solid var(--line)}
+  .rule.good{background:var(--green-soft);border-color:#c6ece0}
+  .rule.bad{background:var(--red-soft);border-color:#f6cfcb}
+  .rule h4{margin:0 0 8px;font-size:13.5px}
+  .rule.good h4{color:#0b7a56} .rule.bad h4{color:#b32f24}
+  .rule code{font-family:var(--mono);font-size:12.5px;background:rgba(255,255,255,.75);padding:1px 6px;border-radius:5px;display:inline-block;margin:2px 0}
+  .formula{font-family:var(--mono);font-size:13px;background:#f7f8fd;border:1px solid var(--line);border-radius:9px;
+    padding:10px 14px;margin-bottom:9px}
+  .formula b{color:var(--indigo)}
+  footer{text-align:center;font-size:12px;color:var(--muted);padding:8px 0}
+  .flash-msg{font-size:12.5px;font-weight:600;padding:6px 12px;border-radius:8px;display:none}
+  .flash-msg.show{display:inline-block}
+  .flash-msg.warn{background:var(--red-soft);color:#b32f24}
+  .flash-msg.ok{background:var(--green-soft);color:#0b7a56}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <span class="tag">核心知识点 04</span>
+    <h1>生产者-消费者问题 · PV 操作</h1>
+    <p>缓冲区是临界资源。empty 管空位、full 管数据、mutex 管互斥。点击「生产 / 消费」，逐步观察三个信号量如何加减、缓冲区如何进出，以及两条顺序铁律。</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- 控制台 -->
+  <section class="card">
+    <h2><span class="num">1</span>控制台<span class="hint">缓冲区大小 N 可调，改动会重置现场</span></h2>
+    <div class="toolbar">
+      <button class="btn prod" id="btnProd">＋ 生产一次（Producer）</button>
+      <button class="btn cons" id="btnCons">－ 消费一次（Consumer）</button>
+      <span class="sep"></span>
+      <button class="btn" id="btnAuto">▶ 自动运行</button>
+      <button class="btn" id="btnReset">↺ 重置</button>
+      <span class="sep"></span>
+      <div class="ctl">缓冲区 N
+        <input type="range" id="nRange" min="1" max="6" step="1" value="3">
+        <b id="nVal" style="font-family:var(--mono);color:var(--indigo)">3</b>
+      </div>
+      <span class="flash-msg" id="flash"></span>
+    </div>
+  </section>
+
+  <!-- 信号量 -->
+  <section class="card">
+    <h2><span class="num">2</span>三个信号量<span class="hint">P 减一 / V 加一</span></h2>
+    <div class="sems">
+      <div class="sem empty-c" id="semEmpty">
+        <div class="name">empty <span class="init">初值 = N</span></div>
+        <div class="val" id="vEmpty">3</div>
+        <div class="role">空位计数 · 生产者申请 / 消费者归还</div>
+      </div>
+      <div class="sem full-c" id="semFull">
+        <div class="name">full <span class="init">初值 = 0</span></div>
+        <div class="val" id="vFull">0</div>
+        <div class="role">数据计数 · 消费者申请 / 生产者释放</div>
+      </div>
+      <div class="sem mutex-c" id="semMutex">
+        <div class="name">mutex <span class="init">初值 = 1</span></div>
+        <div class="val" id="vMutex">1</div>
+        <div class="role">临界区互斥 · 一次只准一个进程操作</div>
+      </div>
+    </div>
+    <div class="invariant">
+      <span>空位守恒：empty + full = N</span>
+      <span class="bar" id="bar"><i id="barFill" style="width:0%"></i></span>
+      <span id="barTxt">empty 3 / full 0</span>
+    </div>
+  </section>
+
+  <!-- 缓冲区 -->
+  <section class="card">
+    <h2><span class="num">3</span>缓冲区（临界资源）<span class="hint">虚线 = 空位，实线 = 已放数据</span></h2>
+    <div class="buffer" id="buffer"></div>
+    <div class="buf-empty" id="bufEmpty">缓冲区为空</div>
+    <div class="flying" id="flying"></div>
+  </section>
+
+  <!-- 代码 + 日志 -->
+  <section class="card">
+    <h2><span class="num">4</span>伪代码与执行日志<span class="hint">高亮行 = 当前执行的语句</span>
+      <button class="btn" id="btnBlank" style="margin-left:auto;font-size:12px;padding:5px 11px">隐藏答案</button>
+    </h2>
+    <div class="cols">
+      <div>
+        <div class="code-title">Producer（生产者）</div>
+        <div class="codeblock" id="codeProd">
+<span class="ln" data-k="p-while"><span class="kw">while</span> (<span class="kw">true</span>) {</span>
+<span class="ln" data-k="p-make">    <span class="cmt">// 生产数据</span></span>
+<span class="ln" data-k="p-empty">    <span class="call">P</span>(<span class="blank" data-b="1">empty</span>);   <span class="cmt">// ← 填空1</span></span>
+<span class="ln" data-k="p-mutex">    <span class="call">P</span>(mutex);</span>
+<span class="ln" data-k="p-put">    <span class="cmt">// 将数据放入缓冲区</span></span>
+<span class="ln" data-k="p-vmutex">    <span class="call">V</span>(mutex);</span>
+<span class="ln" data-k="p-vfull">    <span class="call">V</span>(<span class="blank" data-b="2">full</span>);    <span class="cmt">// ← 填空2</span></span>
+<span class="ln" data-k="p-end">}</span>
+        </div>
+        <div class="code-title" style="margin-top:14px">Consumer（消费者）</div>
+        <div class="codeblock" id="codeCons">
+<span class="ln" data-k="c-while"><span class="kw">while</span> (<span class="kw">true</span>) {</span>
+<span class="ln" data-k="c-full">    <span class="call">P</span>(<span class="blank" data-b="3">full</span>);    <span class="cmt">// ← 填空3</span></span>
+<span class="ln" data-k="c-mutex">    <span class="call">P</span>(mutex);</span>
+<span class="ln" data-k="c-get">    <span class="cmt">// 从缓冲区取出数据</span></span>
+<span class="ln" data-k="c-vmutex">    <span class="call">V</span>(mutex);</span>
+<span class="ln" data-k="c-vempty">    <span class="call">V</span>(empty);</span>
+<span class="ln" data-k="c-eat">    <span class="cmt">// 消费数据</span></span>
+<span class="ln" data-k="c-end">}</span>
+        </div>
+      </div>
+      <div>
+        <div class="code-title">执行日志</div>
+        <div class="log" id="log"><div class="empty">尚无操作，点击「生产」或「消费」开始</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 铁律 -->
+  <section class="card">
+    <h2><span class="num">5</span>两条顺序铁律</h2>
+    <div class="rules">
+      <div class="rule good">
+        <h4>✓ 正确顺序</h4>
+        <code>P(empty) → P(mutex) → 放入 → V(mutex) → V(full)</code><br>
+        <code>P(full) → P(mutex) → 取出 → V(mutex) → V(empty)</code>
+        <div style="margin-top:8px;color:#0b7a56">同步信号量的 P 排在互斥 P 之前；同步信号量的 V 排在互斥 V 之后。</div>
+      </div>
+      <div class="rule bad">
+        <h4>✗ 顺序颠倒 → 死锁</h4>
+        <code>P(mutex) → P(empty) ...</code>
+        <div style="margin-top:8px;color:#b32f24">若缓冲区已满，生产者会<b>抱着 mutex 去等 empty</b>；消费者又拿不到 mutex 去取数据，双方互相等待，形成循环等待 → 死锁。</div>
+      </div>
+    </div>
+    <div style="margin-top:16px">
+      <div class="formula">生产者：P(empty) 占一个空位 → P(mutex) 进临界区 → 放入 → V(mutex) 出临界区 → V(full) 通知「有数据」</div>
+      <div class="formula">消费者：P(full) 等一个数据 → P(mutex) 进临界区 → 取出 → V(mutex) 出临界区 → V(empty) 归还空位</div>
+      <div class="formula">不变式：<b>empty + full = N</b>（P 减一、V 加一，恒等式可用于自查答案是否写反）</div>
+    </div>
+  </section>
+
+  <footer>软考 · 系统分析师 · 操作系统-进程管理 —— 生产者消费者 PV 操作演示</footer>
+</div>
+
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var sleep = function(ms){ return new Promise(function(r){ setTimeout(r, ms); }); };
+
+  var S = { N:3, empty:3, full:0, mutex:1, slots:[], produced:0, consumed:0, busy:false, auto:false };
+
+  /* ---------- 渲染 ---------- */
+  function renderSems(){
+    $('vEmpty').textContent = S.empty;
+    $('vFull').textContent = S.full;
+    $('vMutex').textContent = S.mutex;
+    var pct = S.N ? (S.full / S.N * 100) : 0;
+    $('barFill').style.width = pct + '%';
+    $('barTxt').textContent = 'empty ' + S.empty + ' / full ' + S.full;
+  }
+  function flashSem(which){
+    var map = {empty:'semEmpty', full:'semFull', mutex:'semMutex'};
+    var el = $(map[which]);
+    el.classList.add('flash');
+    setTimeout(function(){ el.classList.remove('flash'); }, 380);
+  }
+  function renderBuffer(popIdx){
+    var box = $('buffer'); box.innerHTML = '';
+    var count = 0;
+    S.slots.forEach(function(item, i){
+      var d = document.createElement('div');
+      d.className = 'slot' + (item !== null ? ' filled' : '');
+      if(popIdx === i) d.classList.add('pop');
+      d.innerHTML = '<span class="idx">槽 '+i+'</span>' +
+        (item !== null
+          ? '<span class="content">D'+item+'</span><span class="lbl">已放数据</span>'
+          : '<span class="content" style="color:#c3c8dd">·</span><span class="lbl">空位</span>');
+      box.appendChild(d);
+      if(item !== null) count++;
+    });
+    $('bufEmpty').style.display = count ? 'none' : 'block';
+    $('bufEmpty').textContent = '缓冲区为空';
+  }
+  function hl(key){
+    document.querySelectorAll('.codeblock .ln').forEach(function(ln){
+      ln.classList.toggle('hl', ln.dataset.k === key);
+    });
+  }
+  function log(who, cls, txt, sv){
+    var box = $('log');
+    var e = box.querySelector('.empty'); if(e) e.remove();
+    var item = document.createElement('div');
+    item.className = 'item ' + cls;
+    item.innerHTML = '<span class="who">' + who + '</span>' +
+                     '<span class="txt">' + txt + '</span>' +
+                     (sv ? '<span class="sv">' + sv + '</span>' : '');
+    box.appendChild(item);
+    box.scrollTop = box.scrollHeight;
+  }
+  function setBusy(b){
+    S.busy = b;
+    var disable = b || S.auto;
+    $('btnProd').disabled = disable;
+    $('btnCons').disabled = disable;
+    $('btnAuto').disabled = b;
+    $('nRange').disabled = b || S.auto;
+  }
+  function msg(text, kind){
+    var f = $('flash');
+    f.className = 'flash-msg show ' + kind;
+    f.textContent = text;
+    clearTimeout(msg._t);
+    msg._t = setTimeout(function(){ f.className = 'flash-msg'; }, 2600);
+  }
+  function sv(){ return 'empty=' + S.empty + ' full=' + S.full + ' mutex=' + S.mutex; }
+
+  /* ---------- 生产者 ---------- */
+  async function produce(){
+    if(S.busy) return;
+    setBusy(true);
+    log('生产者', 'prod', '开始生产数据');
+
+    hl('p-empty'); await sleep(450);
+    if(S.empty <= 0){
+      hl('p-empty');
+      log('生产者', 'block', 'P(empty) 阻塞：缓冲区已满，没有空位，生产者等待', sv());
+      msg('缓冲区已满：P(empty) 阻塞，生产者被挂起', 'warn');
+      renderBuffer();
+      setBusy(false);
+      return;
+    }
+    S.empty--; flashSem('empty'); renderSems();
+    log('生产者', 'prod', 'P(empty) 申请一个空位', sv());
+    await sleep(330);
+
+    hl('p-mutex'); await sleep(450);
+    S.mutex--; flashSem('mutex'); renderSems();
+    log('生产者', 'prod', 'P(mutex) 进入临界区', sv());
+    await sleep(330);
+
+    hl('p-put'); await sleep(320);
+    var idx = S.slots.indexOf(null);
+    S.slots[idx] = ++S.produced;
+    renderBuffer(idx);
+    log('生产者', 'prod', '把数据 D' + S.produced + ' 放入槽 ' + idx, sv());
+    await sleep(430);
+
+    hl('p-vmutex'); await sleep(450);
+    S.mutex++; flashSem('mutex'); renderSems();
+    log('生产者', 'prod', 'V(mutex) 退出临界区', sv());
+    await sleep(330);
+
+    hl('p-vfull'); await sleep(450);
+    S.full++; flashSem('full'); renderSems();
+    log('生产者', 'prod', 'V(full) 通知：多了一个数据', sv());
+    await sleep(330);
+
+    hl('');
+    setBusy(false);
+  }
+
+  /* ---------- 消费者 ---------- */
+  async function consume(){
+    if(S.busy) return;
+    setBusy(true);
+    log('消费者', 'cons', '开始消费数据');
+
+    hl('c-full'); await sleep(450);
+    if(S.full <= 0){
+      hl('c-full');
+      log('消费者', 'block', 'P(full) 阻塞：缓冲区为空，没有数据，消费者等待', sv());
+      msg('缓冲区为空：P(full) 阻塞，消费者被挂起', 'warn');
+      renderBuffer();
+      setBusy(false);
+      return;
+    }
+    S.full--; flashSem('full'); renderSems();
+    log('消费者', 'cons', 'P(full) 申请一个数据', sv());
+    await sleep(330);
+
+    hl('c-mutex'); await sleep(450);
+    S.mutex--; flashSem('mutex'); renderSems();
+    log('消费者', 'cons', 'P(mutex) 进入临界区', sv());
+    await sleep(330);
+
+    hl('c-get'); await sleep(320);
+    var idx = S.slots.findIndex(function(x){ return x !== null; });
+    var data = S.slots[idx];
+    S.slots[idx] = null;
+    S.consumed++;
+    renderBuffer(idx);
+    log('消费者', 'cons', '从槽 ' + idx + ' 取出数据 D' + data, sv());
+    await sleep(430);
+
+    hl('c-vmutex'); await sleep(450);
+    S.mutex++; flashSem('mutex'); renderSems();
+    log('消费者', 'cons', 'V(mutex) 退出临界区', sv());
+    await sleep(330);
+
+    hl('c-vempty'); await sleep(450);
+    S.empty++; flashSem('empty'); renderSems();
+    log('消费者', 'cons', 'V(empty) 归还一个空位', sv());
+    await sleep(330);
+
+    hl('');
+    setBusy(false);
+  }
+
+  /* ---------- 重置 ---------- */
+  function reset(n){
+    S.N = n || S.N;
+    S.empty = S.N; S.full = 0; S.mutex = 1;
+    S.slots = new Array(S.N).fill(null);
+    S.produced = 0; S.consumed = 0;
+    S.busy = false; S.auto = false;
+    $('btnAuto').textContent = '▶ 自动运行';
+    $('log').innerHTML = '<div class="empty">尚无操作，点击「生产」或「消费」开始</div>';
+    hl('');
+    renderSems(); renderBuffer();
+    $('flying').textContent = '';
+    $('nVal').textContent = S.N;
+    $('nRange').value = S.N;
+    setBusy(false);
+  }
+
+  /* ---------- 自动运行 ---------- */
+  async function autoLoop(){
+    while(S.auto){
+      // 缓冲区满则消费，空则生产，否则随机
+      if(S.full === S.N || S.full >= S.N){ await consume(); }
+      else if(S.full === 0){ await produce(); }
+      else { Math.random() < 0.5 ? await produce() : await consume(); }
+      await sleep(650);
+    }
+  }
+  $('btnAuto').addEventListener('click', function(){
+    if(S.auto){
+      S.auto = false; this.textContent = '▶ 自动运行'; setBusy(false);
+      msg('已暂停自动运行', 'ok');
+    } else {
+      S.auto = true; this.textContent = '⏸ 暂停'; setBusy(false);
+      msg('自动运行中：生产者与消费者交替执行', 'ok');
+      autoLoop();
+    }
+  });
+
+  /* ---------- 事件 ---------- */
+  $('btnProd').addEventListener('click', produce);
+  $('btnCons').addEventListener('click', consume);
+  $('btnReset').addEventListener('click', function(){ reset(); msg('已重置为初值', 'ok'); });
+  $('nRange').addEventListener('input', function(){ reset(parseInt(this.value, 10)); });
+  $('btnBlank').addEventListener('click', function(){
+    var hidden = document.querySelector('.codeblock .blank').classList.toggle('hide');
+    this.textContent = hidden ? '显示答案' : '隐藏答案';
+  });
+
+  // 初始化
+  reset(3);
+})();
+</script>
+</body>
+</html>

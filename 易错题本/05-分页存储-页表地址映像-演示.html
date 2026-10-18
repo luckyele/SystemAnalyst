@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>分页存储 · 页表地址映像 交互演示</title>
+<style>
+  :root{
+    --bg:#f5f6fb;
+    --panel:#ffffff;
+    --ink:#1f2233;
+    --muted:#6b7086;
+    --line:#e4e6f0;
+    --indigo:#4f46e5;
+    --indigo-soft:#eef0ff;
+    --green:#0ea472;
+    --green-soft:#e7f7f1;
+    --red:#e0483c;
+    --red-soft:#fdeceb;
+    --amber:#d98a00;
+    --amber-soft:#fdf3e0;
+    --shadow:0 1px 2px rgba(31,34,51,.06),0 8px 24px -12px rgba(31,34,51,.18);
+    --mono:"SF Mono","JetBrains Mono","Cascadia Code",Consolas,"Courier New",monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px 64px}
+
+  /* ---------- header ---------- */
+  header{
+    background:linear-gradient(135deg,#312e81 0%,#4f46e5 55%,#6366f1 100%);
+    color:#fff;padding:34px 20px 30px;margin-bottom:26px;
+  }
+  header .inner{max-width:1080px;margin:0 auto}
+  header .tag{
+    display:inline-block;font-size:12px;letter-spacing:.14em;
+    background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);
+    padding:3px 11px;border-radius:999px;margin-bottom:12px;
+  }
+  header h1{margin:0 0 8px;font-size:26px;letter-spacing:.02em}
+  header p{margin:0;font-size:14px;color:rgba(255,255,255,.82);max-width:760px}
+
+  /* ---------- generic panel ---------- */
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:20px 22px;box-shadow:var(--shadow);margin-bottom:20px;
+  }
+  .card h2{
+    font-size:15px;margin:0 0 16px;display:flex;align-items:center;gap:9px;
+    letter-spacing:.02em;
+  }
+  .card h2 .num{
+    display:inline-flex;align-items:center;justify-content:center;
+    width:22px;height:22px;border-radius:6px;background:var(--indigo);
+    color:#fff;font-size:12px;font-family:var(--mono);flex:none;
+  }
+  .hint{font-size:12.5px;color:var(--muted);font-weight:400;margin-left:auto}
+
+  /* ---------- params ---------- */
+  .params{display:flex;flex-wrap:wrap;gap:10px}
+  .param{
+    flex:1 1 150px;background:var(--indigo-soft);border:1px solid #dfe2ff;
+    border-radius:10px;padding:11px 14px;
+  }
+  .param .k{font-size:12px;color:#5257a8}
+  .param .v{font-family:var(--mono);font-size:17px;font-weight:600;color:#312e81}
+  .param .v small{font-size:12px;font-weight:500;color:#6b6fb8}
+
+  /* ---------- controls ---------- */
+  .controls{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+  .ctl{
+    display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);
+  }
+  input[type=number]{
+    font-family:var(--mono);font-size:15px;width:110px;padding:7px 10px;
+    border:1px solid var(--line);border-radius:8px;color:var(--ink);background:#fff;
+  }
+  input[type=number]:focus{outline:2px solid var(--indigo);border-color:var(--indigo)}
+  input[type=range]{flex:1 1 260px;accent-color:var(--indigo);min-width:180px}
+  .btn{
+    font:inherit;font-size:13px;padding:8px 15px;border-radius:9px;cursor:pointer;
+    border:1px solid var(--line);background:#fff;color:var(--ink);transition:.15s;
+  }
+  .btn:hover{border-color:var(--indigo);color:var(--indigo)}
+  .btn.primary{background:var(--indigo);border-color:var(--indigo);color:#fff}
+  .btn.primary:hover{background:#4338ca}
+  .presets{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .chip{
+    font-family:var(--mono);font-size:12.5px;padding:5px 11px;border-radius:999px;
+    border:1px dashed #c9ccee;background:#fff;color:#4b4f9c;cursor:pointer;transition:.15s;
+  }
+  .chip:hover{background:var(--indigo-soft);border-style:solid}
+
+  /* ---------- bit split ---------- */
+  .split-row{display:flex;align-items:flex-end;gap:26px;flex-wrap:wrap;margin-bottom:6px}
+  .bits{display:flex;gap:5px}
+  .bit{
+    width:30px;height:38px;border-radius:7px;display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:17px;font-weight:600;
+    border:1px solid var(--line);background:#fbfbfe;transition:.25s;
+  }
+  .bit.vpn{background:var(--amber-soft);border-color:#f0d9a8;color:#8a5a00}
+  .bit.off{background:var(--indigo-soft);border-color:#d8dcff;color:#3a3f96}
+  .bit.gap{margin-left:12px}
+  .bit.pop{transform:translateY(-5px);box-shadow:0 6px 14px -6px rgba(79,70,229,.55)}
+  .bit-label{font-size:12px;color:var(--muted);text-align:center}
+  .bit-groups{display:flex;gap:38px;flex-wrap:wrap}
+  .bit-group{display:flex;flex-direction:column;gap:6px;align-items:center}
+  .bit-group .cap{
+    font-size:12.5px;font-weight:600;padding:2px 10px;border-radius:999px;
+  }
+  .cap.vpn{background:var(--amber-soft);color:#8a5a00}
+  .cap.off{background:var(--indigo-soft);color:#3a3f96}
+  .split-eq{
+    font-family:var(--mono);font-size:15px;display:flex;gap:18px;flex-wrap:wrap;
+    padding-top:10px;border-top:1px dashed var(--line);margin-top:14px;
+  }
+  .split-eq b{color:var(--amber)}
+  .split-eq i{font-style:normal;color:var(--indigo)}
+
+  /* ---------- page table ---------- */
+  .ptable{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px}
+  .ptable th,.ptable td{padding:9px 6px;text-align:center;border-bottom:1px solid var(--line)}
+  .ptable thead th{font-size:12px;color:var(--muted);font-weight:600;background:#fafbff}
+  .ptable tbody tr{transition:.2s;cursor:pointer}
+  .ptable tbody tr:hover{background:#fafbff}
+  .ptable td.mono{font-family:var(--mono);font-size:14px}
+  .ptable tr.active{background:#fff9e8 !important;box-shadow:inset 3px 0 0 var(--amber)}
+  .badge{
+    display:inline-block;min-width:22px;padding:1px 9px;border-radius:999px;
+    font-family:var(--mono);font-size:12.5px;font-weight:600;
+  }
+  .badge.ok{background:var(--green-soft);color:var(--green)}
+  .badge.no{background:var(--red-soft);color:var(--red)}
+
+  /* ---------- result ---------- */
+  .result{
+    display:grid;grid-template-columns:1.05fr 1fr;gap:16px;
+  }
+  @media(max-width:720px){.result{grid-template-columns:1fr}}
+  .verdict{
+    border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;justify-content:center;
+    border:1px solid var(--line);
+  }
+  .verdict.ok{background:var(--green-soft);border-color:#c6ece0}
+  .verdict.no{background:var(--red-soft);border-color:#f6cfcb}
+  .verdict .title{font-size:17px;font-weight:700;display:flex;align-items:center;gap:9px}
+  .verdict.ok .title{color:#0b7a56}
+  .verdict.no .title{color:#b32f24}
+  .verdict .sub{font-size:13px;color:var(--muted);margin-top:6px}
+  .verdict .dots{display:flex;gap:5px;margin-top:12px}
+  .dot{width:9px;height:9px;border-radius:50%;background:currentColor;opacity:.25}
+  .verdict.ok .dot{color:var(--green)}
+  .verdict.no .dot{color:var(--red)}
+
+  .steps{display:flex;flex-direction:column;gap:9px}
+  .step{
+    display:flex;gap:12px;align-items:baseline;padding:9px 13px;border-radius:10px;
+    background:#fafbff;border:1px solid var(--line);font-size:13.5px;
+    opacity:.4;transition:.3s;
+  }
+  .step.on{opacity:1;background:#fff;border-color:#d9dcff;box-shadow:var(--shadow)}
+  .step .n{
+    font-family:var(--mono);font-size:12px;color:#fff;background:#c3c6e0;
+    border-radius:5px;padding:1px 7px;flex:none;transition:.3s;
+  }
+  .step.on .n{background:var(--indigo)}
+  .step .expr{font-family:var(--mono);font-size:13.5px;color:#3a3f96}
+  .step .res{font-family:var(--mono);font-weight:700;color:var(--ink)}
+  .step.bad.on{background:var(--red-soft);border-color:#f6cfcb}
+  .step.bad.on .n{background:var(--red)}
+  .step.bad.on .res{color:var(--red)}
+
+  /* ---------- memory strip ---------- */
+  .mem{
+    display:flex;border-radius:11px;overflow:hidden;border:1px solid var(--line);
+    margin-bottom:12px;
+  }
+  .frame{
+    flex:1;padding:12px 6px;text-align:center;border-right:1px solid var(--line);
+    background:#fbfbfe;transition:.25s;position:relative;
+  }
+  .frame:last-child{border-right:0}
+  .frame.hit{background:var(--green-soft)}
+  .frame .fno{font-family:var(--mono);font-size:14px;font-weight:700;color:#33365c}
+  .frame .frange{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:2px}
+  .frame .fpage{
+    font-size:11.5px;margin-top:5px;display:inline-block;padding:1px 8px;border-radius:999px;
+    background:var(--indigo-soft);color:#3a3f96;font-family:var(--mono);
+  }
+  .frame.hit .fpage{background:#c9eddf;color:#0b7a56}
+  .frame .fpage.none{background:#eef0f5;color:#9aa0b5}
+  .mem-legend{display:flex;flex-wrap:wrap;gap:16px;font-size:12px;color:var(--muted)}
+  .mem-legend span{display:flex;align-items:center;gap:6px}
+  .sw{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+  /* ---------- notes ---------- */
+  .notes{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:720px){.notes{grid-template-columns:1fr}}
+  .note{border-left:3px solid var(--amber);background:var(--amber-soft);padding:10px 14px;border-radius:0 9px 9px 0;font-size:13px}
+  .note b{color:#8a5a00}
+  .formula{
+    font-family:var(--mono);font-size:13.5px;background:#f7f8fd;border:1px solid var(--line);
+    border-radius:9px;padding:11px 14px;margin-bottom:9px;color:#33365c;
+  }
+  .formula b{color:var(--indigo)}
+  .formula em{font-style:normal;color:var(--amber)}
+  footer{text-align:center;font-size:12px;color:var(--muted);padding:8px 0}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <span class="tag">核心知识点 05</span>
+    <h1>分页存储 · 页表地址映像</h1>
+    <p>页表把「虚页号 → 实页号」，装入位标记该页是否已在主存。拖动地址，观察虚拟地址如何被拆成虚页号与页内偏移，再经页表换算为主存实地址。</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- 参数 -->
+  <section class="card">
+    <h2><span class="num">1</span>演示参数<span class="hint">取自原题：8 页虚拟空间 / 每页 1024B / 主存 4096B</span></h2>
+    <div class="params">
+      <div class="param"><div class="k">页大小</div><div class="v">1024 <small>B = 2<sup>10</sup></small></div></div>
+      <div class="param"><div class="k">虚拟页面数</div><div class="v">8 <small>→ 虚页号 3 位</small></div></div>
+      <div class="param"><div class="k">页内偏移位数</div><div class="v">10 <small>bit</small></div></div>
+      <div class="param"><div class="k">主存大小</div><div class="v">4096 <small>B = 4 个实页</small></div></div>
+      <div class="param"><div class="k">虚拟地址总位数</div><div class="v">13 <small>bit (3+10)</small></div></div>
+    </div>
+  </section>
+
+  <!-- 输入 -->
+  <section class="card">
+    <h2><span class="num">2</span>选择虚拟地址<span class="hint">范围 0 ~ 8191</span></h2>
+    <div class="controls">
+      <div class="ctl">虚拟地址
+        <input type="number" id="addrInput" min="0" max="8191" step="1" value="1023">
+      </div>
+      <input type="range" id="addrRange" min="0" max="8191" step="1" value="1023">
+      <button class="btn primary" id="playBtn">一键演示 1023</button>
+    </div>
+    <div class="presets" id="presets"></div>
+  </section>
+
+  <!-- 地址分解 -->
+  <section class="card">
+    <h2><span class="num">3</span>虚拟地址分解为二进制<span class="hint">前 3 位 = 虚页号，后 10 位 = 页内偏移</span></h2>
+    <div class="split-row">
+      <div class="bit-groups">
+        <div class="bit-group">
+          <div class="cap vpn">虚页号 · 3 bit</div>
+          <div class="bits" id="vpnBits"></div>
+        </div>
+        <div class="bit-group">
+          <div class="cap off">页内偏移 · 10 bit</div>
+          <div class="bits" id="offBits"></div>
+        </div>
+      </div>
+    </div>
+    <div class="split-eq">
+      <span>虚页号 = ⌊ <span id="eqA">1023</span> ÷ 1024 ⌋ = <b id="eqVpn">0</b></span>
+      <span>页内偏移 = <span id="eqB">1023</span> mod 1024 = <i id="eqOff">1023</i></span>
+    </div>
+  </section>
+
+  <!-- 页表 -->
+  <section class="card">
+    <h2><span class="num">4</span>查页表<span class="hint">按虚页号定位行，读实页号与装入位</span></h2>
+    <table class="ptable">
+      <thead>
+        <tr><th>虚页号</th><th>0</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th><th>7</th></tr>
+      </thead>
+      <tbody>
+        <tr id="rowFrame"><th>实页号</th><td class="mono">3</td><td class="mono">1</td><td class="mono">2</td><td class="mono">3</td><td class="mono">2</td><td class="mono">1</td><td class="mono">0</td><td class="mono">0</td></tr>
+        <tr id="rowValid"><th>装入位</th>
+          <td><span class="badge ok">1</span></td><td><span class="badge ok">1</span></td>
+          <td><span class="badge no">0</span></td><td><span class="badge no">0</span></td>
+          <td><span class="badge ok">1</span></td><td><span class="badge no">0</span></td>
+          <td><span class="badge ok">1</span></td><td><span class="badge no">0</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- 结果 -->
+  <section class="card">
+    <h2><span class="num">5</span>地址换算结果</h2>
+    <div class="result">
+      <div class="verdict" id="verdict">
+        <div class="title" id="verdictTitle">—</div>
+        <div class="sub" id="verdictSub">—</div>
+        <div class="dots" id="verdictDots"></div>
+      </div>
+      <div class="steps" id="steps">
+        <div class="step" id="s1"><span class="n">1</span><span>分解地址 &nbsp;<span class="expr">虚页号=<b id="s1a">0</b>, 偏移=<b id="s1b">1023</b></span></span></div>
+        <div class="step" id="s2"><span class="n">2</span><span>查表取实页号 &nbsp;<span class="expr">frame = <b id="s2a">3</b></span></span></div>
+        <div class="step" id="s3"><span class="n">3</span><span>判装入位 &nbsp;<span class="expr">valid = <b id="s3a">1</b></span></span></div>
+        <div class="step" id="s4"><span class="n">4</span><span>算实地址 &nbsp;<span class="expr">phys = <span class="res" id="s4a">4095</span></span></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 主存 -->
+  <section class="card">
+    <h2><span class="num">6</span>主存实页视图<span class="hint">4 个实页，每个 1024B</span></h2>
+    <div class="mem" id="memStrip"></div>
+    <div class="mem-legend">
+      <span><i class="sw" style="background:var(--green)"></i>本次访问命中实页</span>
+      <span><i class="sw" style="background:#c9ccee"></i>已被其他虚页占用</span>
+      <span><i class="sw" style="background:#eef0f5"></i>空/未装载的对应项</span>
+    </div>
+  </section>
+
+  <!-- 公式与易错点 -->
+  <section class="card">
+    <h2><span class="num">7</span>公式与易错点</h2>
+    <div class="notes">
+      <div>
+        <div class="formula">虚页号 = ⌊虚拟地址 ÷ 页大小⌋<br>页内偏移 = 虚拟地址 mod 页大小</div>
+        <div class="formula">实地址 = <em>实页号</em> × 页大小 + 页内偏移</div>
+        <div class="formula">偏移位数 = log₂(页大小) = 10<br>虚页号位数 = log₂(页面数) = 3</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div class="note"><b>偏移 ≠ 实地址：</b>1023 只是页内偏移，实地址要再乘加实页号，得 4095。</div>
+        <div class="note"><b>1023 属于第 0 页：</b>地址从 0 编号，第 0 页覆盖 [0,1023]，偏移取满值。</div>
+        <div class="note"><b>装入位为 0 即缺页：</b>本题失效虚页号为 <b>2、3、5、7</b>，不产生实地址。</div>
+        <div class="note"><b>越界自检：</b>实地址应小于主存容量，4095 &lt; 4096 ✓。</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>软考 · 系统分析师 · 计算机组成与体系结构 —— 分页存储演示</footer>
+</div>
+
+<script>
+(function(){
+  var PAGE_SIZE = 1024, VPN_BITS = 3, OFF_BITS = 10, TOTAL_BITS = 13;
+  var FRAMES = 4;
+  // 页表：虚页号 -> {实页号, 装入位}
+  var TABLE = [
+    {frame:3, valid:1}, {frame:1, valid:1}, {frame:2, valid:0}, {frame:3, valid:0},
+    {frame:2, valid:1}, {frame:1, valid:0}, {frame:0, valid:1}, {frame:0, valid:0}
+  ];
+
+  var $ = function(id){ return document.getElementById(id); };
+  var input = $('addrInput'), range = $('addrRange');
+
+  // ---- 预置地址 ----
+  var PRESETS = [
+    {v:1023, t:'1023（原题）'}, {v:0, t:'0'}, {v:1024, t:'1024'},
+    {v:2048, t:'2048 缺页'}, {v:3071, t:'3071'}, {v:5120, t:'5120 缺页'}, {v:7168, t:'7168 缺页'}
+  ];
+  var presetBox = $('presets');
+  PRESETS.forEach(function(p){
+    var b = document.createElement('span');
+    b.className = 'chip'; b.textContent = p.t;
+    b.onclick = function(){ setAddr(p.v); };
+    presetBox.appendChild(b);
+  });
+
+  // ---- 主存视图 ----
+  function buildMem(){
+    var strip = $('memStrip'); strip.innerHTML = '';
+    for(var f=0; f<FRAMES; f++){
+      var owners = [];
+      TABLE.forEach(function(e, vpn){ if(e.valid===1 && e.frame===f) owners.push(vpn); });
+      var d = document.createElement('div');
+      d.className = 'frame'; d.id = 'frame'+f;
+      var start = f*PAGE_SIZE, end = start+PAGE_SIZE-1;
+      var pageTxt = owners.length ? ('← 虚页 '+owners.join(', ')) : '未占用';
+      d.innerHTML =
+        '<div class="fno">实页 '+f+'</div>' +
+        '<div class="frange">'+start+'–'+end+'</div>' +
+        '<div class="fpage'+(owners.length?'':' none')+'">'+pageTxt+'</div>';
+      strip.appendChild(d);
+    }
+  }
+
+  // ---- 位显示 ----
+  function renderBits(va){
+    var bin = va.toString(2).padStart(TOTAL_BITS,'0');
+    var vpnBin = bin.slice(0, VPN_BITS), offBin = bin.slice(VPN_BITS);
+    var vpnBox = $('vpnBits'), offBox = $('offBits');
+    vpnBox.innerHTML = ''; offBox.innerHTML = '';
+    for(var i=0;i<vpnBin.length;i++){
+      var s = document.createElement('div');
+      s.className = 'bit vpn'; s.textContent = vpnBin[i]; s.dataset.i = i;
+      vpnBox.appendChild(s);
+    }
+    for(var j=0;j<offBin.length;j++){
+      var o = document.createElement('div');
+      o.className = 'bit off'; o.textContent = offBin[j]; o.dataset.i = j;
+      offBox.appendChild(o);
+    }
+  }
+
+  function popBits(on){
+    ['#vpnBits .bit','#offBits .bit'].forEach(function(sel){
+      document.querySelectorAll(sel).forEach(function(el){
+        if(on){ el.classList.add('pop'); } else { el.classList.remove('pop'); }
+      });
+    });
+  }
+
+  // ---- 高亮页表列 ----
+  function highlightCol(vpn){
+    ['rowFrame','rowValid'].forEach(function(rid){
+      var row = $(rid);
+      Array.prototype.forEach.call(row.children, function(td, idx){
+        td.style.background = '';
+        td.style.transition = 'background .25s';
+      });
+      // 第 0 个 child 是行标题 th，数据从索引 1 开始
+      var target = row.children[vpn + 1];
+      if(target) target.style.background = '#fff3cf';
+    });
+    // 竖直方向的整列感
+    $('rowFrame').children[vpn+1].style.boxShadow = 'inset 0 0 0 2px #f0c96a';
+    $('rowValid').children[vpn+1].style.boxShadow = 'inset 0 0 0 2px #f0c96a';
+  }
+  function clearColGlow(){
+    ['rowFrame','rowValid'].forEach(function(rid){
+      Array.prototype.forEach.call($(rid).children, function(td){
+        td.style.background=''; td.style.boxShadow='none';
+      });
+    });
+  }
+
+  // ---- 步骤状态 ----
+  function setSteps(n){
+    ['s1','s2','s3','s4'].forEach(function(id){ $(id).classList.remove('on'); });
+    for(var i=1;i<=n;i++){ $('s'+i).classList.add('on'); }
+  }
+
+  // ---- 渲染 ----
+  function render(va){
+    var vpn = Math.floor(va / PAGE_SIZE);
+    var off = va % PAGE_SIZE;
+    var entry = TABLE[vpn];
+    var valid = entry.valid, frame = entry.frame;
+    var phys = frame * PAGE_SIZE + off;
+
+    renderBits(va);
+    highlightCol(vpn);
+
+    $('eqA').textContent = va; $('eqB').textContent = va;
+    $('eqVpn').textContent = vpn; $('eqOff').textContent = off;
+
+    $('s1a').textContent = vpn; $('s1b').textContent = off;
+    $('s2a').textContent = frame;
+    $('s3a').textContent = valid;
+
+    var v = $('verdict'), s4 = $('s4');
+    // 主存命中高亮
+    for(var f=0; f<FRAMES; f++){ $('frame'+f).classList.toggle('hit', valid===1 && f===frame); }
+
+    if(valid === 1){
+      v.className = 'verdict ok';
+      $('verdictTitle').innerHTML = '✓ 访问成功';
+      $('verdictSub').innerHTML = '虚页 ' + vpn + ' 已装入实页 ' + frame + '，主存实地址 = ' +
+        frame + ' × 1024 + ' + off + ' = <b>' + phys + '</b>';
+      s4.classList.remove('bad');
+      $('s4a').textContent = phys;
+      setSteps(4);
+    } else {
+      v.className = 'verdict no';
+      $('verdictTitle').innerHTML = '✗ 页面失效（缺页）';
+      $('verdictSub').innerHTML = '虚页 ' + vpn + ' 的装入位 = 0，该页不在主存，不产生实地址，需从外存调入。';
+      s4.classList.add('bad');
+      $('s4a').textContent = '缺页，无实地址';
+      setSteps(3);
+    }
+
+    // 结果卡装饰点
+    var dots = $('verdictDots'); dots.innerHTML = '';
+    for(var d=0; d<5; d++){ var dot=document.createElement('i'); dot.className='dot'; dots.appendChild(dot); }
+
+    input.value = va; range.value = va;
+  }
+
+  function setAddr(va){
+    va = Math.max(0, Math.min(8191, Math.round(va) || 0));
+    render(va);
+  }
+
+  // ---- 事件 ----
+  input.addEventListener('input', function(){ setAddr(parseInt(input.value,10)); });
+  range.addEventListener('input', function(){ setAddr(parseInt(range.value,10)); });
+
+  // ---- 一键演示：从 1023 开始，逐步骤动效 ----
+  var playing = false;
+  $('playBtn').addEventListener('click', function(){
+    if(playing) return; playing = true;
+    var btn = this; btn.disabled = true;
+    setAddr(1023);
+    clearColGlow(); setSteps(0); popBits(false);
+    var seq = [
+      function(){ popBits(true); },                                 // 位分解
+      function(){ highlightCol(0); },                               // 查表定位
+      function(){ setSteps(3); },                                   // 判装入位
+      function(){ setSteps(4); renderFinal(); }                     // 算实地址
+    ];
+    var i = 0;
+    function next(){
+      if(i >= seq.length){ playing = false; btn.disabled = false; return; }
+      seq[i](); i++; setTimeout(next, 780);
+    }
+    // 首帧先清空再动
+    setTimeout(next, 260);
+  });
+
+  function renderFinal(){
+    // 重新渲染一次确保结果卡内容正确（内容已由 render 计算）
+    render(1023);
+    setSteps(4);
+  }
+
+  // ---- 初始化 ----
+  buildMem();
+  render(1023);
+  setSteps(0);
+  setTimeout(function(){ render(1023); }, 0);
+})();
+</script>
+</body>
+</html>
