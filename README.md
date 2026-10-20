@@ -63,6 +63,7 @@
 | 106 | 数据持久化框架辨析-iBatis与Hibernate | [106-数据持久化框架辨析-iBatis与Hibernate.md](易错题本/106-数据持久化框架辨析-iBatis与Hibernate.md) | 易 | 待复习 |
 | 107 | 全自动ORM框架-Hibernate与MyBatis | [107-全自动ORM框架-Hibernate与MyBatis.md](易错题本/107-全自动ORM框架-Hibernate与MyBatis.md) | 易 | 待复习 |
 | 108 | 应用程序与数据库交互方式-嵌入式SQL | [108-应用程序与数据库交互方式-嵌入式SQL.md](易错题本/108-应用程序与数据库交互方式-嵌入式SQL.md) | 易 | 待复习 |
+| 151 | SQL隔离级别-四级对比 | [151-SQL隔离级别-四级对比.md](易错题本/151-SQL隔离级别-四级对比.md) | 易 | 待复习 |
 
 ## 六、企业信息化与战略
 
