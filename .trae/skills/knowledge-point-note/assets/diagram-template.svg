@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 430" width="720" height="430" role="img" aria-label="结构示意图">
+  <style>
+    :root {
+      --surface: #ffffff;
+      --surface-2: #f6f7f9;
+      --text: #1a1d21;
+      --text-2: #5b6470;
+      --brand: #2f6feb;
+      --brand-weak: #eaf1ff;
+      --danger: #d93a3a;
+      --danger-weak: #fdeceb;
+      --border: #d7dde6;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --surface: #16181d;
+        --surface-2: #1e2128;
+        --text: #eef1f6;
+        --text-2: #a2adbd;
+        --brand: #6f9bff;
+        --brand-weak: #1e2b45;
+        --danger: #ff7a72;
+        --danger-weak: #3a2020;
+        --border: #333a45;
+      }
+    }
+    .bg { fill: var(--surface); }
+    .card { fill: var(--surface-2); stroke: var(--border); stroke-width: 1; }
+    .card-brand { fill: var(--brand-weak); stroke: var(--brand); stroke-width: 1.5; }
+    .card-danger { fill: var(--danger-weak); stroke: var(--danger); stroke-width: 1.5; }
+    .t-title { fill: var(--text); font-size: 16px; font-weight: 700; }
+    .t-body { fill: var(--text); font-size: 14px; font-weight: 600; }
+    .t-sub { fill: var(--text-2); font-size: 12px; }
+    .t-note { fill: var(--text-2); font-size: 13px; }
+    .t-brand { fill: var(--brand); font-size: 14px; font-weight: 700; }
+    .t-danger { fill: var(--danger); font-size: 12px; }
+    .ln { stroke: var(--text-2); stroke-width: 1.5; fill: none; }
+    .ln-danger { stroke: var(--danger); stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; }
+    text { font-family: "Noto Sans CJK SC", "Source Han Sans SC", sans-serif; }
+  </style>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M1 1 L7 4 L1 7 Z" fill="var(--text-2)"/>
+    </marker>
+    <marker id="arrowDanger" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M1 1 L7 4 L1 7 Z" fill="var(--danger)"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="720" height="430"/>
+
+  <text class="t-title" x="40" y="36">图标题：一句话说清这张图讲什么</text>
+
+  <!-- 左侧输入：按需增减，最多三个 -->
+  <rect class="card" x="50" y="60" width="160" height="76" rx="10"/>
+  <text class="t-body" x="130" y="92" text-anchor="middle">元素 A</text>
+  <text class="t-sub" x="130" y="114" text-anchor="middle">状态说明</text>
+
+  <rect class="card-danger" x="50" y="176" width="160" height="76" rx="10"/>
+  <text class="t-body" x="130" y="208" text-anchor="middle">元素 B</text>
+  <text class="t-danger" x="130" y="230" text-anchor="middle">异常状态说明</text>
+
+  <rect class="card" x="50" y="292" width="160" height="76" rx="10"/>
+  <text class="t-body" x="130" y="324" text-anchor="middle">元素 C</text>
+  <text class="t-sub" x="130" y="346" text-anchor="middle">状态说明</text>
+
+  <!-- 连线 -->
+  <path class="ln" d="M210 98 C258 98 292 172 330 180" marker-end="url(#arrow)"/>
+  <path class="ln-danger" d="M210 214 H330" marker-end="url(#arrowDanger)"/>
+  <path class="ln" d="M210 330 C258 330 292 256 330 248" marker-end="url(#arrow)"/>
+
+  <!-- 中心环节：全图唯一焦点 -->
+  <rect class="card-brand" x="330" y="154" width="150" height="120" rx="10"/>
+  <text class="t-brand" x="405" y="202" text-anchor="middle">中心环节</text>
+  <text class="t-sub" x="405" y="228" text-anchor="middle">处理规则</text>
+
+  <!-- 输出 -->
+  <path class="ln" d="M480 214 H580" marker-end="url(#arrow)"/>
+  <rect class="card" x="580" y="176" width="110" height="76" rx="10"/>
+  <text class="t-body" x="635" y="208" text-anchor="middle">输出</text>
+  <text class="t-sub" x="635" y="230" text-anchor="middle">结果说明</text>
+
+  <text class="t-note" x="360" y="404" text-anchor="middle">底部一句话：这张图最重要的结论</text>
+</svg>
